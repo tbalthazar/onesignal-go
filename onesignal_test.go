@@ -1,6 +1,7 @@
 package onesignal
 
 import (
+	"encoding/json"
 	"io/ioutil"
 	"net/http"
 	"testing"
@@ -22,6 +23,10 @@ func TestNewClient(t *testing.T) {
 
 	if got, want := c.Client, httpClient; got != want {
 		t.Errorf("NewClient Client is %v, want %v", got, want)
+	}
+
+	if got, want := c.Players.client, c; got != want {
+		t.Errorf("NewClient.PlayersService.client is %v, want %v", got, want)
 	}
 }
 
@@ -67,5 +72,23 @@ func TestNewRequest(t *testing.T) {
 	if got, want := req.Header.Get("Authorization"), "Basic "+c.Key; got != want {
 		t.Errorf("NewRequest() Authorization header is %v, want %v", got, want)
 	}
+}
 
+func TestNewRequest_invalidJSON(t *testing.T) {
+	key := "fake key"
+	httpClient := &http.Client{}
+
+	c := NewClient(key, httpClient)
+
+	type T struct {
+		A map[int]interface{}
+	}
+	_, err := c.NewRequest("GET", "/", &T{})
+
+	if err == nil {
+		t.Error("Expected error to be returned.")
+	}
+	if err, ok := err.(*json.UnsupportedTypeError); !ok { // type assertion
+		t.Errorf("Expected a UnsupportedTypeError; got %#v.", err)
+	}
 }

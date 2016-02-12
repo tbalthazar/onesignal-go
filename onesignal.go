@@ -16,6 +16,8 @@ type Client struct {
 	BaseURL *url.URL
 	Key     string
 	Client  *http.Client
+
+	Players *PlayersService
 }
 
 // NewClient returns a new OneSignal API client.
@@ -26,6 +28,8 @@ func NewClient(key string, client *http.Client) *Client {
 		Key:     key,
 		Client:  client,
 	}
+
+	c.Players = &PlayersService{client: c}
 
 	return c
 }
