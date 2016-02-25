@@ -92,3 +92,19 @@ func TestNewRequest_invalidJSON(t *testing.T) {
 		t.Errorf("Expected a UnsupportedTypeError; got %#v.", err)
 	}
 }
+
+func TestNewRequest_emptyBody(t *testing.T) {
+	key := "fake key"
+	httpClient := &http.Client{}
+
+	c := NewClient(key, httpClient)
+
+	req, err := c.NewRequest("GET", "/", nil)
+
+	if err != nil {
+		t.Fatalf("NewRequest returned unexpected error: %v", err)
+	}
+	if req.Body != nil {
+		t.Fatalf("Request contains a non-nil Body: %v", req.Body)
+	}
+}
