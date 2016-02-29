@@ -2,6 +2,8 @@ package onesignal
 
 import (
 	"log"
+	"net/url"
+	"strconv"
 )
 
 type PlayersService struct {
@@ -15,11 +17,24 @@ type PlayerListOptions struct {
 }
 
 func (s *PlayersService) List(opt *PlayerListOptions) {
-	req, err := s.client.NewRequest("GET", "/players", nil)
+	// build the URL with the query string
+	u, err := url.Parse("/players")
+	if err != nil {
+		log.Fatal(err)
+	}
+	q := u.Query()
+	q.Set("app_id", opt.AppId)
+	q.Set("limit", strconv.Itoa(opt.Limit))
+	q.Set("offset", strconv.Itoa(opt.Limit))
+	u.RawQuery = q.Encode()
+
+	// create the request
+	req, err := s.client.NewRequest("GET", u.String(), nil)
 	if err != nil {
 		log.Fatal("Do: ", err)
 	}
 
+	// send the request
 	_, err = s.client.Client.Do(req)
 	if err != nil {
 		log.Fatal("Do: ", err)

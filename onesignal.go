@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"encoding/json"
 	"io"
+	"log"
 	"net/http"
 	"net/url"
 )
@@ -22,7 +23,11 @@ type Client struct {
 
 // NewClient returns a new OneSignal API client.
 func NewClient(key string, client *http.Client) *Client {
-	baseURL, _ := url.Parse(defaultBaseURL)
+	baseURL, err := url.Parse(defaultBaseURL)
+	if err != nil {
+		log.Fatal(err)
+	}
+
 	c := &Client{
 		BaseURL: baseURL,
 		Key:     key,
