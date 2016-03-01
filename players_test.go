@@ -1,9 +1,11 @@
 package onesignal
 
 import (
+	"fmt"
 	"net/http"
 	"net/http/httptest"
 	"net/url"
+	"reflect"
 	"strconv"
 	"testing"
 )
@@ -51,10 +53,26 @@ func TestList(t *testing.T) {
 		if got := r.URL.String(); got != want {
 			t.Errorf("URL: got %v, want %v", got, want)
 		}
-		// fmt.Fprint(w, `[{"number":1}]`)
+		fmt.Fprint(w, `{
+			"total_count":2,
+			"offset":0,
+			"limit":10
+			}`)
 	})
 
-	client.Players.List(opt)
+	res, err := client.Players.List(opt)
+	if err != nil {
+		t.Errorf("List returned an error: %v", err)
+	}
+
+	want := &PlayerListResponse{
+		TotalCount: 2,
+		Offset:     0,
+		Limit:      10,
+	}
+	if !reflect.DeepEqual(res, want) {
+		t.Errorf("List returned %+v, want %+v", res, want)
+	}
 
 	if requestSent == false {
 		t.Errorf("Request has not been sent")

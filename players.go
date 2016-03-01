@@ -1,6 +1,7 @@
 package onesignal
 
 import (
+	"encoding/json"
 	"log"
 	"net/url"
 	"strconv"
@@ -16,11 +17,17 @@ type PlayerListOptions struct {
 	Offset int    `json:"offset"`
 }
 
-func (s *PlayersService) List(opt *PlayerListOptions) {
+type PlayerListResponse struct {
+	TotalCount int `json:"total_count"`
+	Offset     int `json:"offset"`
+	Limit      int `json:"limit"`
+}
+
+func (s *PlayersService) List(opt *PlayerListOptions) (*PlayerListResponse, error) {
 	// build the URL with the query string
 	u, err := url.Parse("/players")
 	if err != nil {
-		log.Fatal(err)
+		return nil, err
 	}
 	q := u.Query()
 	q.Set("app_id", opt.AppId)
@@ -35,19 +42,20 @@ func (s *PlayersService) List(opt *PlayerListOptions) {
 	}
 
 	// send the request
-	_, err = s.client.Client.Do(req)
+	resp, err := s.client.Client.Do(req)
 	if err != nil {
 		log.Fatal("Do: ", err)
 	}
+	defer resp.Body.Close()
 
-	// defer resp.Body.Close()
+	// return nil, nil
 
-	// var playerList PlayerList
-	// dec := json.NewDecoder(resp.Body)
-	// err = dec.Decode(&playerList)
-	// if err != nil {
-	// 	log.Fatal("JSON Decode error: ", err)
-	// }
+	var response PlayerListResponse
+	dec := json.NewDecoder(resp.Body)
+	err = dec.Decode(&response)
+	if err != nil {
+		return nil, err
+	}
 
-	// return &playerList
+	return &response, nil
 }
