@@ -11,6 +11,24 @@ type PlayersService struct {
 	client *Client
 }
 
+type Player struct {
+	Identifier        string            `json:"identifier"`
+	SessionCount      int               `json:"session_count"`
+	Language          string            `json:"language"`
+	Timezone          int               `json:"timezone"`
+	GameVersion       string            `json:"game_version"`
+	DeviceOS          string            `json:"device_os"`
+	DeviceType        int               `json:"device_type"`
+	DeviceModel       string            `json:"device_model"`
+	AdID              string            `json:"ad_id"`
+	Tags              map[string]string `json:"tags"`
+	LastActive        int               `json:"last_active"`
+	AmountSpent       float32           `json:"amount_spent"`
+	CreatedAt         int               `json:"created_at"`
+	InvalidIdentifier bool              `json:"invalid_identifier"`
+	BadgeCount        int               `json:"badge_count"`
+}
+
 type PlayerListOptions struct {
 	AppId  string `json:"app_id"`
 	Limit  int    `json:"limit"`
@@ -21,6 +39,7 @@ type PlayerListResponse struct {
 	TotalCount int `json:"total_count"`
 	Offset     int `json:"offset"`
 	Limit      int `json:"limit"`
+	Players    []Player
 }
 
 func (s *PlayersService) List(opt *PlayerListOptions) (*PlayerListResponse, error) {
