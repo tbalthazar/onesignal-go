@@ -8,20 +8,13 @@ import (
 )
 
 func TestNewClient(t *testing.T) {
-	key := "fake key"
-	httpClient := &http.Client{}
-
-	c := NewClient(key, httpClient)
+	c := NewClient(nil)
 
 	if got, want := c.BaseURL.String(), defaultBaseURL; got != want {
 		t.Errorf("NewClient BaseURL is %v, want %v", got, want)
 	}
 
-	if got, want := c.Key, key; got != want {
-		t.Errorf("NewClient Key is %v, want %v", got, want)
-	}
-
-	if got, want := c.Client, httpClient; got != want {
+	if got, want := c.Client, http.DefaultClient; got != want {
 		t.Errorf("NewClient Client is %v, want %v", got, want)
 	}
 
@@ -30,11 +23,19 @@ func TestNewClient(t *testing.T) {
 	}
 }
 
-func TestNewRequest(t *testing.T) {
-	key := "fake key"
+func TestNewClient_withCustomHTTPClient(t *testing.T) {
 	httpClient := &http.Client{}
 
-	c := NewClient(key, httpClient)
+	c := NewClient(httpClient)
+
+	if got, want := c.Client, httpClient; got != want {
+		t.Errorf("NewClient Client is %v, want %v", got, want)
+	}
+}
+
+func TestNewRequest(t *testing.T) {
+	// key := "fake key"
+	c := NewClient(nil)
 
 	method := "GET"
 	inURL, outURL := "foo", defaultBaseURL+"foo"
@@ -75,10 +76,7 @@ func TestNewRequest(t *testing.T) {
 }
 
 func TestNewRequest_invalidJSON(t *testing.T) {
-	key := "fake key"
-	httpClient := &http.Client{}
-
-	c := NewClient(key, httpClient)
+	c := NewClient(nil)
 
 	type T struct {
 		A map[int]interface{}
@@ -94,10 +92,7 @@ func TestNewRequest_invalidJSON(t *testing.T) {
 }
 
 func TestNewRequest_emptyBody(t *testing.T) {
-	key := "fake key"
-	httpClient := &http.Client{}
-
-	c := NewClient(key, httpClient)
+	c := NewClient(nil)
 
 	req, err := c.NewRequest("GET", "/", nil)
 

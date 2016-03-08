@@ -22,7 +22,11 @@ type Client struct {
 }
 
 // NewClient returns a new OneSignal API client.
-func NewClient(key string, client *http.Client) *Client {
+func NewClient(httpClient *http.Client) *Client {
+	if httpClient == nil {
+		httpClient = http.DefaultClient
+	}
+
 	baseURL, err := url.Parse(defaultBaseURL)
 	if err != nil {
 		log.Fatal(err)
@@ -30,8 +34,7 @@ func NewClient(key string, client *http.Client) *Client {
 
 	c := &Client{
 		BaseURL: baseURL,
-		Key:     key,
-		Client:  client,
+		Client:  httpClient,
 	}
 
 	c.Players = &PlayersService{client: c}
