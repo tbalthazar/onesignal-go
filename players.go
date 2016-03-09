@@ -55,7 +55,7 @@ func (s *PlayersService) List(opt *PlayerListOptions) (*PlayerListResponse, erro
 	u.RawQuery = q.Encode()
 
 	// create the request
-	req, err := s.client.NewRequest("GET", u.String(), nil)
+	req, err := s.client.NewRequest("GET", u.String(), nil, APP)
 	if err != nil {
 		log.Fatal("Do: ", err)
 	}

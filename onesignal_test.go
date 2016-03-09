@@ -34,14 +34,18 @@ func TestNewClient_withCustomHTTPClient(t *testing.T) {
 }
 
 func TestNewRequest(t *testing.T) {
-	// key := "fake key"
+	appKey := "fake app key"
+	userKey := "fake user key"
 	c := NewClient(nil)
+	c.AppKey = appKey
+	c.UserKey = userKey
 
 	method := "GET"
 	inURL, outURL := "foo", defaultBaseURL+"foo"
 	inBody := struct{ Foo string }{Foo: "Bar"}
+	authKeyType := APP
 	outBody := `{"Foo":"Bar"}` + "\n"
-	req, _ := c.NewRequest(method, inURL, inBody)
+	req, _ := c.NewRequest(method, inURL, inBody, authKeyType)
 
 	// test the HTTP method
 	if got, want := req.Method, method; got != want {
@@ -70,7 +74,22 @@ func TestNewRequest(t *testing.T) {
 	}
 
 	// test Authorization header
-	if got, want := req.Header.Get("Authorization"), "Basic "+c.Key; got != want {
+	if got, want := req.Header.Get("Authorization"), "Basic "+appKey; got != want {
+		t.Errorf("NewRequest() Authorization header is %v, want %v", got, want)
+	}
+}
+
+func TestNewRequest_userKeyType(t *testing.T) {
+	appKey := "fake app key"
+	userKey := "fake user key"
+	c := NewClient(nil)
+	c.AppKey = appKey
+	c.UserKey = userKey
+
+	req, _ := c.NewRequest("GET", "foo", nil, USER)
+
+	// test Authorization header
+	if got, want := req.Header.Get("Authorization"), "Basic "+userKey; got != want {
 		t.Errorf("NewRequest() Authorization header is %v, want %v", got, want)
 	}
 }
@@ -81,7 +100,7 @@ func TestNewRequest_invalidJSON(t *testing.T) {
 	type T struct {
 		A map[int]interface{}
 	}
-	_, err := c.NewRequest("GET", "/", &T{})
+	_, err := c.NewRequest("GET", "/", &T{}, APP)
 
 	if err == nil {
 		t.Error("Expected error to be returned.")
@@ -94,7 +113,7 @@ func TestNewRequest_invalidJSON(t *testing.T) {
 func TestNewRequest_emptyBody(t *testing.T) {
 	c := NewClient(nil)
 
-	req, err := c.NewRequest("GET", "/", nil)
+	req, err := c.NewRequest("GET", "/", nil, APP)
 
 	if err != nil {
 		t.Fatalf("NewRequest returned unexpected error: %v", err)

@@ -13,9 +13,17 @@ const (
 	defaultBaseURL = "https://onesignal.com/api/v1/"
 )
 
+type AuthKeyType uint
+
+const (
+	APP AuthKeyType = iota
+	USER
+)
+
 type Client struct {
 	BaseURL *url.URL
-	Key     string
+	AppKey  string
+	UserKey string
 	Client  *http.Client
 
 	Players *PlayersService
@@ -43,7 +51,7 @@ func NewClient(httpClient *http.Client) *Client {
 }
 
 // NewRequest creates an API request.
-func (c *Client) NewRequest(method, path string, body interface{}) (*http.Request, error) {
+func (c *Client) NewRequest(method, path string, body interface{}, authKeyType AuthKeyType) (*http.Request, error) {
 	// build the URL
 	u, err := url.Parse(c.BaseURL.String() + path)
 	if err != nil {
@@ -69,7 +77,12 @@ func (c *Client) NewRequest(method, path string, body interface{}) (*http.Reques
 	// headers
 	req.Header.Add("Content-Type", "application/json")
 	req.Header.Add("Accept", "application/json")
-	req.Header.Add("Authorization", "Basic "+c.Key)
+
+	if authKeyType == APP {
+		req.Header.Add("Authorization", "Basic "+c.AppKey)
+	} else {
+		req.Header.Add("Authorization", "Basic "+c.UserKey)
+	}
 
 	return req, nil
 }

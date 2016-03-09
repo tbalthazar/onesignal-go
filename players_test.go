@@ -19,7 +19,6 @@ func TestList(t *testing.T) {
 	defer server.Close()
 
 	// create a client, giving it the test server URL
-	// key := "fake-key"
 	client := NewClient(nil)
 	url, _ := url.Parse(server.URL)
 	client.BaseURL = url
