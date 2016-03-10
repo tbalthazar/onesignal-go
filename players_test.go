@@ -117,3 +117,47 @@ func TestList(t *testing.T) {
 		t.Errorf("Request has not been sent")
 	}
 }
+
+func TestList_returnsError(t *testing.T) {
+	// create a test server and a mux
+	mux := http.NewServeMux()
+	server := httptest.NewServer(mux)
+	defer server.Close()
+
+	// create a client, giving it the test server URL
+	client := NewClient(nil)
+	url, _ := url.Parse(server.URL)
+	client.BaseURL = url
+
+	// PlayerListOptions
+	opt := &PlayerListOptions{
+		AppId:  "fake-app-id",
+		Limit:  10,
+		Offset: 0,
+	}
+
+	mux.HandleFunc("/players", func(w http.ResponseWriter, r *http.Request) {
+		w.WriteHeader(http.StatusBadRequest)
+		fmt.Fprint(w, `{
+		  "errors":
+		  [
+		       "Invalid or missing authentication token"
+		  ]
+			}`)
+	})
+
+	_, resp, err := client.Players.List(opt)
+	errResp, ok := err.(*ErrorResponse)
+	if !ok {
+		t.Errorf("Error should be of type ErrorResponse but is %v: %+v", reflect.TypeOf(err), err)
+	}
+
+	want := "Invalid or missing authentication token"
+	if got := errResp.Messages[0]; want != got {
+		t.Errorf("Error message: %v, want %v", got, want)
+	}
+
+	if got, want := resp.StatusCode, http.StatusBadRequest; want != got {
+		t.Errorf("Status code: %d, want %d", got, want)
+	}
+}

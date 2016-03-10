@@ -7,6 +7,7 @@ import (
 	"log"
 	"net/http"
 	"net/url"
+	"strings"
 )
 
 const (
@@ -27,6 +28,15 @@ type Client struct {
 	Client  *http.Client
 
 	Players *PlayersService
+}
+
+type ErrorResponse struct {
+	Messages []string `json:"errors"`
+}
+
+func (e *ErrorResponse) Error() string {
+	msg := "OneSignal returned those error messages:\n - "
+	return msg + strings.Join(e.Messages, "\n - ")
 }
 
 // NewClient returns a new OneSignal API client.

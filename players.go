@@ -2,7 +2,6 @@ package onesignal
 
 import (
 	"encoding/json"
-	"log"
 	"net/http"
 	"net/url"
 	"strconv"
@@ -58,22 +57,31 @@ func (s *PlayersService) List(opt *PlayerListOptions) (*PlayerListResponse, *htt
 	// create the request
 	req, err := s.client.NewRequest("GET", u.String(), nil, APP)
 	if err != nil {
-		log.Fatal("Do: ", err)
+		return nil, nil, err
 	}
 
 	// send the request
 	resp, err := s.client.Client.Do(req)
 	if err != nil {
-		log.Fatal("Do: ", err)
+		return nil, nil, err
 	}
 	defer resp.Body.Close()
 
-	var response PlayerListResponse
-	dec := json.NewDecoder(resp.Body)
-	err = dec.Decode(&response)
-	if err != nil {
-		return nil, nil, err
+	if resp.StatusCode == 200 {
+		var response PlayerListResponse
+		dec := json.NewDecoder(resp.Body)
+		err = dec.Decode(&response)
+		if err != nil {
+			return nil, nil, err
+		}
+		return &response, resp, nil
+	} else {
+		var errResp ErrorResponse
+		dec := json.NewDecoder(resp.Body)
+		err := dec.Decode(&errResp)
+		if err != nil {
+			return nil, nil, err
+		}
+		return nil, resp, &errResp
 	}
-
-	return &response, resp, nil
 }
