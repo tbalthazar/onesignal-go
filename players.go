@@ -3,6 +3,7 @@ package onesignal
 import (
 	"encoding/json"
 	"log"
+	"net/http"
 	"net/url"
 	"strconv"
 )
@@ -42,11 +43,11 @@ type PlayerListResponse struct {
 	Players    []Player
 }
 
-func (s *PlayersService) List(opt *PlayerListOptions) (*PlayerListResponse, error) {
+func (s *PlayersService) List(opt *PlayerListOptions) (*PlayerListResponse, *http.Response, error) {
 	// build the URL with the query string
 	u, err := url.Parse("/players")
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
 	q := u.Query()
 	q.Set("app_id", opt.AppId)
@@ -67,14 +68,12 @@ func (s *PlayersService) List(opt *PlayerListOptions) (*PlayerListResponse, erro
 	}
 	defer resp.Body.Close()
 
-	// return nil, nil
-
 	var response PlayerListResponse
 	dec := json.NewDecoder(resp.Body)
 	err = dec.Decode(&response)
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
 
-	return &response, nil
+	return &response, resp, nil
 }

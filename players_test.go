@@ -79,7 +79,7 @@ func TestList(t *testing.T) {
 			}`)
 	})
 
-	res, err := client.Players.List(opt)
+	listRes, _, err := client.Players.List(opt)
 	if err != nil {
 		t.Errorf("List returned an error: %v", err)
 	}
@@ -109,8 +109,8 @@ func TestList(t *testing.T) {
 		Limit:      10,
 		Players:    []Player{player},
 	}
-	if !reflect.DeepEqual(res, want) {
-		t.Errorf("List returned %+v, want %+v", res, want)
+	if !reflect.DeepEqual(listRes, want) {
+		t.Errorf("List returned %+v, want %+v", listRes, want)
 	}
 
 	if requestSent == false {
