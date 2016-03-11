@@ -4,6 +4,8 @@ import (
 	"encoding/json"
 	"io/ioutil"
 	"net/http"
+	"reflect"
+	"strings"
 	"testing"
 )
 
@@ -120,5 +122,71 @@ func TestNewRequest_emptyBody(t *testing.T) {
 	}
 	if req.Body != nil {
 		t.Fatalf("Request contains a non-nil Body: %v", req.Body)
+	}
+}
+
+func TestCheckResponse_ok(t *testing.T) {
+	r := &http.Response{
+		StatusCode: http.StatusOK,
+	}
+
+	err := CheckResponse(r)
+	if err != nil {
+		t.Fatalf("CheckResponse shouldn't return an error, but returned: %+v", err)
+	}
+}
+
+func TestCheckResponse_badRequest(t *testing.T) {
+	r := &http.Response{
+		StatusCode: http.StatusBadRequest,
+		Body: ioutil.NopCloser(strings.NewReader(`{
+			"errors":
+			[
+				"Invalid or missing authentication token"
+			]
+		}`)),
+	}
+
+	err, ok := CheckResponse(r).(*ErrorResponse)
+	if !ok {
+		t.Errorf("CheckResponse return value should be of type ErrorResponse but is %v: %+v", reflect.TypeOf(err), err)
+	}
+
+	if err == nil {
+		t.Fatalf("CheckResponse should return an error")
+	}
+
+	if len(err.Messages) == 0 {
+		t.Fatalf("CheckResponse ErrorResponse should contain messages")
+	}
+
+	want := "Invalid or missing authentication token"
+	if got := err.Messages[0]; want != got {
+		t.Errorf("Error message: %v, want %v", got, want)
+	}
+}
+
+func TestCheckResponse_noBody(t *testing.T) {
+	r := &http.Response{
+		StatusCode: http.StatusBadRequest,
+		Body:       ioutil.NopCloser(strings.NewReader("")),
+	}
+
+	err, ok := CheckResponse(r).(*ErrorResponse)
+	if !ok {
+		t.Errorf("CheckResponse return value should be of type ErrorResponse but is %v: %+v", reflect.TypeOf(err), err)
+	}
+
+	if err == nil {
+		t.Fatalf("CheckResponse should return an error")
+	}
+
+	if len(err.Messages) != 1 {
+		t.Fatalf("CheckResponse ErrorResponse should contain 1 message")
+	}
+
+	want := "Couldn't decode response body JSON"
+	if got := err.Messages[0]; want != got {
+		t.Errorf("Error message: %v, want %v", got, want)
 	}
 }

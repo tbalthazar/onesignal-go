@@ -96,3 +96,17 @@ func (c *Client) NewRequest(method, path string, body interface{}, authKeyType A
 
 	return req, nil
 }
+
+func CheckResponse(r *http.Response) error {
+	if r.StatusCode == http.StatusOK {
+		return nil
+	} else {
+		var errResp ErrorResponse
+		dec := json.NewDecoder(r.Body)
+		err := dec.Decode(&errResp)
+		if err != nil {
+			errResp.Messages = []string{"Couldn't decode response body JSON"}
+		}
+		return &errResp
+	}
+}

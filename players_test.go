@@ -141,7 +141,7 @@ func TestList_returnsError(t *testing.T) {
 		fmt.Fprint(w, `{
 		  "errors":
 		  [
-		       "Invalid or missing authentication token"
+				"Invalid or missing authentication token"
 		  ]
 			}`)
 	})

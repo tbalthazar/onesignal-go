@@ -67,21 +67,16 @@ func (s *PlayersService) List(opt *PlayerListOptions) (*PlayerListResponse, *htt
 	}
 	defer resp.Body.Close()
 
-	if resp.StatusCode == 200 {
-		var response PlayerListResponse
-		dec := json.NewDecoder(resp.Body)
-		err = dec.Decode(&response)
-		if err != nil {
-			return nil, nil, err
-		}
-		return &response, resp, nil
-	} else {
-		var errResp ErrorResponse
-		dec := json.NewDecoder(resp.Body)
-		err := dec.Decode(&errResp)
-		if err != nil {
-			return nil, nil, err
-		}
-		return nil, resp, &errResp
+	err = CheckResponse(resp)
+	if err != nil {
+		return nil, resp, err
 	}
+
+	var plResp PlayerListResponse
+	dec := json.NewDecoder(resp.Body)
+	err = dec.Decode(&plResp)
+	if err != nil {
+		return nil, nil, err
+	}
+	return &plResp, resp, nil
 }
