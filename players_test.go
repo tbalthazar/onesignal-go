@@ -1,6 +1,7 @@
 package onesignal
 
 import (
+	"encoding/json"
 	"fmt"
 	"net/http"
 	"net/http/httptest"
@@ -159,5 +160,79 @@ func TestList_returnsError(t *testing.T) {
 
 	if got, want := resp.StatusCode, http.StatusBadRequest; want != got {
 		t.Errorf("Status code: %d, want %d", got, want)
+	}
+}
+
+func TestCreate(t *testing.T) {
+	requestSent := false
+
+	// create a test server and a mux
+	mux := http.NewServeMux()
+	server := httptest.NewServer(mux)
+	defer server.Close()
+
+	// create a client, giving it the test server URL
+	client := NewClient(nil)
+	url, _ := url.Parse(server.URL)
+	client.BaseURL = url
+
+	// PlayerRequest
+	player := &PlayerRequest{
+		AppID:        "fake-app-id",
+		DeviceType:   0,
+		Identifier:   "fake-identifier",
+		Language:     "fake-language",
+		Timezone:     -28800,
+		GameVersion:  "1.0",
+		DeviceOS:     "iOS",
+		DeviceModel:  "iPhone5,2",
+		AdID:         "fake-ad-id",
+		SDK:          "fake-sdk",
+		SessionCount: 1,
+		Tags: map[string]string{
+			"a":   "1",
+			"foo": "bar",
+		},
+		AmountSpent: 0,
+		CreatedAt:   1395096859,
+		Playtime:    12,
+		BadgeCount:  1,
+		LastActive:  1395096859,
+		TestType:    1,
+	}
+
+	mux.HandleFunc("/players", func(w http.ResponseWriter, r *http.Request) {
+		requestSent = true
+
+		// test method
+		want := "POST"
+		if got := r.Method; got != want {
+			t.Errorf("Request method: %v, want %v", got, want)
+		}
+
+		// test body
+		body := &PlayerRequest{}
+		json.NewDecoder(r.Body).Decode(body)
+		if !reflect.DeepEqual(body, player) {
+			t.Errorf("Request body: %+v, want %+v", body, player)
+		}
+
+		fmt.Fprint(w, `{
+			"success": true,
+			"id": "ffffb794-ba37-11e3-8077-031d62f86ebf"
+		}`)
+	})
+
+	createRes, _, _ := client.Players.Create(player)
+	want := &PlayerCreateResponse{
+		Success: true,
+		ID:      "ffffb794-ba37-11e3-8077-031d62f86ebf",
+	}
+	if !reflect.DeepEqual(want, createRes) {
+		t.Errorf("Request response: %+v, want %+v", createRes, want)
+	}
+
+	if requestSent == false {
+		t.Errorf("Request has not been sent")
 	}
 }
