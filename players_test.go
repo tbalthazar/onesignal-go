@@ -25,7 +25,7 @@ func TestList(t *testing.T) {
 
 	// PlayerListOptions
 	opt := &PlayerListOptions{
-		AppId:  "fake-app-id",
+		AppID:  "fake-app-id",
 		Limit:  10,
 		Offset: 0,
 	}
@@ -44,7 +44,7 @@ func TestList(t *testing.T) {
 		u.Scheme = ""
 		u.Host = ""
 		q := u.Query()
-		q.Set("app_id", opt.AppId)
+		q.Set("app_id", opt.AppID)
 		q.Set("limit", strconv.Itoa(opt.Limit))
 		q.Set("offset", strconv.Itoa(opt.Limit))
 		u.RawQuery = q.Encode()
@@ -131,7 +131,7 @@ func TestList_returnsError(t *testing.T) {
 
 	// PlayerListOptions
 	opt := &PlayerListOptions{
-		AppId:  "fake-app-id",
+		AppID:  "fake-app-id",
 		Limit:  10,
 		Offset: 0,
 	}

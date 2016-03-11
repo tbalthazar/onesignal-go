@@ -30,7 +30,7 @@ type Player struct {
 }
 
 type PlayerListOptions struct {
-	AppId  string `json:"app_id"`
+	AppID  string `json:"app_id"`
 	Limit  int    `json:"limit"`
 	Offset int    `json:"offset"`
 }
@@ -49,7 +49,7 @@ func (s *PlayersService) List(opt *PlayerListOptions) (*PlayerListResponse, *htt
 		return nil, nil, err
 	}
 	q := u.Query()
-	q.Set("app_id", opt.AppId)
+	q.Set("app_id", opt.AppID)
 	q.Set("limit", strconv.Itoa(opt.Limit))
 	q.Set("offset", strconv.Itoa(opt.Limit))
 	u.RawQuery = q.Encode()
