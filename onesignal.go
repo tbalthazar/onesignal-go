@@ -98,9 +98,14 @@ func (c *Client) NewRequest(method, path string, body interface{}, authKeyType A
 }
 
 func CheckResponse(r *http.Response) error {
-	if r.StatusCode == http.StatusOK {
+	switch r.StatusCode {
+	case http.StatusOK:
 		return nil
-	} else {
+	case http.StatusInternalServerError:
+		return &ErrorResponse{
+			Messages: []string{"Internal Server Error"},
+		}
+	default:
 		var errResp ErrorResponse
 		dec := json.NewDecoder(r.Body)
 		err := dec.Decode(&errResp)

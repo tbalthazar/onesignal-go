@@ -47,7 +47,7 @@ func TestList(t *testing.T) {
 		q := u.Query()
 		q.Set("app_id", opt.AppID)
 		q.Set("limit", strconv.Itoa(opt.Limit))
-		q.Set("offset", strconv.Itoa(opt.Limit))
+		q.Set("offset", strconv.Itoa(opt.Offset))
 		u.RawQuery = q.Encode()
 		want = u.String()
 		if got := r.URL.String(); got != want {
@@ -71,7 +71,7 @@ func TestList(t *testing.T) {
 		       "ad_id":null,
 		       "tags":{"a":"1","foo":"bar"},
 		       "last_active":1395096859,
-		       "amount_spent":0,
+		       "amount_spent":"0",
 		       "created_at":1395096859,
 		       "invalid_identifier":false,
 		       "badge_count": 0
@@ -99,7 +99,7 @@ func TestList(t *testing.T) {
 			"foo": "bar",
 		},
 		LastActive:        1395096859,
-		AmountSpent:       0,
+		AmountSpent:       "0",
 		CreatedAt:         1395096859,
 		InvalidIdentifier: false,
 		BadgeCount:        0,

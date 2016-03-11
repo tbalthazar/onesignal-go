@@ -23,7 +23,7 @@ type Player struct {
 	AdID              string            `json:"ad_id"`
 	Tags              map[string]string `json:"tags"`
 	LastActive        int               `json:"last_active"`
-	AmountSpent       float32           `json:"amount_spent"`
+	AmountSpent       string            `json:"amount_spent"`
 	CreatedAt         int               `json:"created_at"`
 	InvalidIdentifier bool              `json:"invalid_identifier"`
 	BadgeCount        int               `json:"badge_count"`
@@ -77,7 +77,7 @@ func (s *PlayersService) List(opt *PlayerListOptions) (*PlayerListResponse, *htt
 	q := u.Query()
 	q.Set("app_id", opt.AppID)
 	q.Set("limit", strconv.Itoa(opt.Limit))
-	q.Set("offset", strconv.Itoa(opt.Limit))
+	q.Set("offset", strconv.Itoa(opt.Offset))
 	u.RawQuery = q.Encode()
 
 	// create the request
