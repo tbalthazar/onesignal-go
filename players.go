@@ -34,25 +34,25 @@ type Player struct {
 }
 
 type PlayerRequest struct {
-	AppID             string            `json:"app_id"`
-	DeviceType        int               `json:"device_type"`
-	Identifier        string            `json:"identifier"`
-	Language          string            `json:"language"`
-	Timezone          int               `json:"timezone"`
-	GameVersion       string            `json:"game_version"`
-	DeviceOS          string            `json:"device_os"`
-	DeviceModel       string            `json:"device_model"`
-	AdID              string            `json:"ad_id"`
-	SDK               string            `json:"sdk"`
-	SessionCount      int               `json:"session_count"`
-	Tags              map[string]string `json:"tags"`
-	AmountSpent       float32           `json:"amount_spent"`
-	CreatedAt         int               `json:"created_at"`
-	Playtime          int               `json:"playtime"`
-	BadgeCount        int               `json:"badge_count"`
-	LastActive        int               `json:"last_active"`
-	TestType          int               `json:"test_type"`
-	NotificationTypes string            `json:"notification_types"`
+	AppID             string            `json:"app_id,omitempty"`
+	DeviceType        int               `json:"device_type,omitempty"`
+	Identifier        string            `json:"identifier,omitempty"`
+	Language          string            `json:"language,omitempty"`
+	Timezone          int               `json:"timezone,omitempty"`
+	GameVersion       string            `json:"game_version,omitempty"`
+	DeviceOS          string            `json:"device_os,omitempty"`
+	DeviceModel       string            `json:"device_model,omitempty"`
+	AdID              string            `json:"ad_id,omitempty"`
+	SDK               string            `json:"sdk,omitempty"`
+	SessionCount      int               `json:"session_count,omitempty"`
+	Tags              map[string]string `json:"tags,omitempty"`
+	AmountSpent       float32           `json:"amount_spent,omitempty"`
+	CreatedAt         int               `json:"created_at,omitempty"`
+	Playtime          int               `json:"playtime,omitempty"`
+	BadgeCount        int               `json:"badge_count,omitempty"`
+	LastActive        int               `json:"last_active,omitempty"`
+	TestType          int               `json:"test_type,omitempty"`
+	NotificationTypes string            `json:"notification_types,omitempty"`
 }
 
 type PlayerListOptions struct {
