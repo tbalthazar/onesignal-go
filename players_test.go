@@ -60,6 +60,9 @@ func TestList(t *testing.T) {
 		  "players":
 		  [
 		     {
+					 "id": "id123",
+					 "playtime": 0,
+					 "sdk": "fake-sdk",
 		       "identifier":"ce777617da7f548fe7a9ab6febb56cf39fba6d382000c0395666288d961ee566",
 		       "session_count":1,
 		       "language":"en",
@@ -71,7 +74,7 @@ func TestList(t *testing.T) {
 		       "ad_id":null,
 		       "tags":{"a":"1","foo":"bar"},
 		       "last_active":1395096859,
-		       "amount_spent":"0",
+		       "amount_spent":0.0,
 		       "created_at":1395096859,
 		       "invalid_identifier":false,
 		       "badge_count": 0
@@ -86,6 +89,9 @@ func TestList(t *testing.T) {
 	}
 
 	player := Player{
+		ID:           "id123",
+		Playtime:     0,
+		SDK:          "fake-sdk",
 		Identifier:   "ce777617da7f548fe7a9ab6febb56cf39fba6d382000c0395666288d961ee566",
 		SessionCount: 1,
 		Language:     "en",
@@ -99,7 +105,7 @@ func TestList(t *testing.T) {
 			"foo": "bar",
 		},
 		LastActive:        1395096859,
-		AmountSpent:       "0",
+		AmountSpent:       0.0,
 		CreatedAt:         1395096859,
 		InvalidIdentifier: false,
 		BadgeCount:        0,
@@ -230,6 +236,77 @@ func TestCreate(t *testing.T) {
 	}
 	if !reflect.DeepEqual(want, createRes) {
 		t.Errorf("Request response: %+v, want %+v", createRes, want)
+	}
+
+	if requestSent == false {
+		t.Errorf("Request has not been sent")
+	}
+}
+
+func TestUpdate(t *testing.T) {
+	requestSent := false
+
+	// create a test server and a mux
+	mux := http.NewServeMux()
+	server := httptest.NewServer(mux)
+	defer server.Close()
+
+	// create a client, giving it the test server URL
+	client := NewClient(nil)
+	url, _ := url.Parse(server.URL)
+	client.BaseURL = url
+
+	// PlayerRequest
+	player := &PlayerRequest{
+		Identifier:   "fake-identifier",
+		Language:     "fake-language",
+		Timezone:     -28800,
+		GameVersion:  "1.0",
+		DeviceOS:     "iOS",
+		DeviceModel:  "iPhone5,2",
+		AdID:         "fake-ad-id",
+		SDK:          "fake-sdk",
+		SessionCount: 1,
+		Tags: map[string]string{
+			"a":   "1",
+			"foo": "bar",
+		},
+		AmountSpent:       0,
+		CreatedAt:         1395096859,
+		Playtime:          12,
+		BadgeCount:        1,
+		LastActive:        1395096859,
+		TestType:          1,
+		NotificationTypes: "2",
+	}
+
+	mux.HandleFunc("/players/fake-id", func(w http.ResponseWriter, r *http.Request) {
+		requestSent = true
+
+		// test method
+		want := "PUT"
+		if got := r.Method; got != want {
+			t.Errorf("Request method: %v, want %v", got, want)
+		}
+
+		// test body
+		body := &PlayerRequest{}
+		json.NewDecoder(r.Body).Decode(body)
+		if !reflect.DeepEqual(body, player) {
+			t.Errorf("Request body: %+v, want %+v", body, player)
+		}
+
+		fmt.Fprint(w, `{
+			"success": true
+		}`)
+	})
+
+	updateRes, _, _ := client.Players.Update("fake-id", player)
+	want := &PlayerUpdateResponse{
+		Success: true,
+	}
+	if !reflect.DeepEqual(want, updateRes) {
+		t.Errorf("Request response: %+v, want %+v", updateRes, want)
 	}
 
 	if requestSent == false {

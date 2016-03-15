@@ -2,6 +2,7 @@ package onesignal
 
 import (
 	"encoding/json"
+	"fmt"
 	"net/http"
 	"net/url"
 	"strconv"
@@ -12,6 +13,9 @@ type PlayersService struct {
 }
 
 type Player struct {
+	ID                string            `json:"id"`
+	Playtime          int               `json:"playtime"`
+	SDK               string            `json:"sdk"`
 	Identifier        string            `json:"identifier"`
 	SessionCount      int               `json:"session_count"`
 	Language          string            `json:"language"`
@@ -23,31 +27,32 @@ type Player struct {
 	AdID              string            `json:"ad_id"`
 	Tags              map[string]string `json:"tags"`
 	LastActive        int               `json:"last_active"`
-	AmountSpent       string            `json:"amount_spent"`
+	AmountSpent       float32           `json:"amount_spent"`
 	CreatedAt         int               `json:"created_at"`
 	InvalidIdentifier bool              `json:"invalid_identifier"`
 	BadgeCount        int               `json:"badge_count"`
 }
 
 type PlayerRequest struct {
-	AppID        string            `json:"app_id"`
-	DeviceType   int               `json:"device_type"`
-	Identifier   string            `json:"identifier"`
-	Language     string            `json:"language"`
-	Timezone     int               `json:"timezone"`
-	GameVersion  string            `json:"game_version"`
-	DeviceOS     string            `json:"device_os"`
-	DeviceModel  string            `json:"device_model"`
-	AdID         string            `json:"ad_id"`
-	SDK          string            `json:"sdk"`
-	SessionCount int               `json:"session_count"`
-	Tags         map[string]string `json:"tags"`
-	AmountSpent  float32           `json:"amount_spent"`
-	CreatedAt    int               `json:"created_at"`
-	Playtime     int               `json:"playtime"`
-	BadgeCount   int               `json:"badge_count"`
-	LastActive   int               `json:"last_active"`
-	TestType     int               `json:"test_type"`
+	AppID             string            `json:"app_id"`
+	DeviceType        int               `json:"device_type"`
+	Identifier        string            `json:"identifier"`
+	Language          string            `json:"language"`
+	Timezone          int               `json:"timezone"`
+	GameVersion       string            `json:"game_version"`
+	DeviceOS          string            `json:"device_os"`
+	DeviceModel       string            `json:"device_model"`
+	AdID              string            `json:"ad_id"`
+	SDK               string            `json:"sdk"`
+	SessionCount      int               `json:"session_count"`
+	Tags              map[string]string `json:"tags"`
+	AmountSpent       float32           `json:"amount_spent"`
+	CreatedAt         int               `json:"created_at"`
+	Playtime          int               `json:"playtime"`
+	BadgeCount        int               `json:"badge_count"`
+	LastActive        int               `json:"last_active"`
+	TestType          int               `json:"test_type"`
+	NotificationTypes string            `json:"notification_types"`
 }
 
 type PlayerListOptions struct {
@@ -66,6 +71,10 @@ type PlayerListResponse struct {
 type PlayerCreateResponse struct {
 	Success bool   `json:"success"`
 	ID      string `json:"id"`
+}
+
+type PlayerUpdateResponse struct {
+	Success bool `json:"success"`
 }
 
 func (s *PlayersService) List(opt *PlayerListOptions) (*PlayerListResponse, *http.Response, error) {
@@ -108,7 +117,7 @@ func (s *PlayersService) List(opt *PlayerListOptions) (*PlayerListResponse, *htt
 }
 
 func (s *PlayersService) Create(player *PlayerRequest) (*PlayerCreateResponse, *http.Response, error) {
-	// build the URL with the query string
+	// build the URL
 	u, err := url.Parse("/players")
 	if err != nil {
 		return nil, nil, err
@@ -133,6 +142,41 @@ func (s *PlayersService) Create(player *PlayerRequest) (*PlayerCreateResponse, *
 	}
 
 	var plResp PlayerCreateResponse
+	dec := json.NewDecoder(resp.Body)
+	err = dec.Decode(&plResp)
+	if err != nil {
+		return nil, resp, err
+	}
+	return &plResp, resp, nil
+}
+
+func (s *PlayersService) Update(playerID string, player *PlayerRequest) (*PlayerUpdateResponse, *http.Response, error) {
+	// build the URL with the query string
+	path := fmt.Sprintf("/players/%s", playerID)
+	u, err := url.Parse(path)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	// create the request
+	req, err := s.client.NewRequest("PUT", u.String(), player, APP)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	// send the request
+	resp, err := s.client.Client.Do(req)
+	if err != nil {
+		return nil, nil, err
+	}
+	defer resp.Body.Close()
+
+	err = CheckResponse(resp)
+	if err != nil {
+		return nil, resp, err
+	}
+
+	var plResp PlayerUpdateResponse
 	dec := json.NewDecoder(resp.Body)
 	err = dec.Decode(&plResp)
 	if err != nil {
