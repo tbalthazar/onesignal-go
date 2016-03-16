@@ -4,33 +4,11 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
-	"net/http/httptest"
 	"net/url"
 	"reflect"
 	"strconv"
 	"testing"
 )
-
-var (
-	mux    *http.ServeMux
-	server *httptest.Server
-	client *Client
-)
-
-func setup() {
-	// create a test server and a mux
-	mux = http.NewServeMux()
-	server = httptest.NewServer(mux)
-
-	// create a client, giving it the test server URL
-	client = NewClient(nil)
-	url, _ := url.Parse(server.URL)
-	client.BaseURL = url
-}
-
-func teardown() {
-	server.Close()
-}
 
 func testMethod(t *testing.T, r *http.Request, want string) {
 	if got := r.Method; got != want {

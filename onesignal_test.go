@@ -2,12 +2,36 @@ package onesignal
 
 import (
 	"encoding/json"
+	"fmt"
 	"io/ioutil"
 	"net/http"
+	"net/http/httptest"
+	"net/url"
 	"reflect"
 	"strings"
 	"testing"
 )
+
+var (
+	mux    *http.ServeMux
+	server *httptest.Server
+	client *Client
+)
+
+func setup() {
+	// create a test server and a mux
+	mux = http.NewServeMux()
+	server = httptest.NewServer(mux)
+
+	// create a client, giving it the test server URL
+	client = NewClient(nil)
+	url, _ := url.Parse(server.URL)
+	client.BaseURL = url
+}
+
+func teardown() {
+	server.Close()
+}
 
 func TestNewClient(t *testing.T) {
 	c := NewClient(nil)
@@ -122,6 +146,46 @@ func TestNewRequest_emptyBody(t *testing.T) {
 	}
 	if req.Body != nil {
 		t.Fatalf("Request contains a non-nil Body: %v", req.Body)
+	}
+}
+
+func TestDo(t *testing.T) {
+	setup()
+	defer teardown()
+
+	type foo struct {
+		A string
+	}
+
+	mux.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
+		testMethod(t, r, "GET")
+		fmt.Fprint(w, `{"A":"a"}`)
+	})
+
+	req, _ := client.NewRequest("GET", "/", nil, APP)
+	body := new(foo)
+	client.Do(req, body)
+
+	want := &foo{"a"}
+	if !reflect.DeepEqual(body, want) {
+		t.Errorf("Response body = %v, want %v", body, want)
+	}
+}
+
+func TestDo_httpError(t *testing.T) {
+	setup()
+	defer teardown()
+
+	mux.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
+		http.Error(w, "Bad Request", 400)
+	})
+
+	req, _ := client.NewRequest("GET", "/", nil, APP)
+	_, err := client.Do(req, nil)
+
+	_, ok := err.(*ErrorResponse)
+	if !ok {
+		t.Errorf("Error should be of type ErrorResponse but is %v: %+v", reflect.TypeOf(err), err)
 	}
 }
 

@@ -97,6 +97,27 @@ func (c *Client) NewRequest(method, path string, body interface{}, authKeyType A
 	return req, nil
 }
 
+func (c *Client) Do(r *http.Request, v interface{}) (*http.Response, error) {
+	// send the request
+	resp, err := c.Client.Do(r)
+	if err != nil {
+		return nil, err
+	}
+	defer resp.Body.Close()
+
+	err = CheckResponse(resp)
+	if err != nil {
+		return resp, err
+	}
+
+	dec := json.NewDecoder(resp.Body)
+	err = dec.Decode(&v)
+	if err != nil {
+		return resp, err
+	}
+	return resp, nil
+}
+
 func CheckResponse(r *http.Response) error {
 	switch r.StatusCode {
 	case http.StatusOK:
