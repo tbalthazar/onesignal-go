@@ -38,6 +38,13 @@ func testMethod(t *testing.T, r *http.Request, want string) {
 	}
 }
 
+func testBody(t *testing.T, r *http.Request, body interface{}, want interface{}) {
+	json.NewDecoder(r.Body).Decode(body)
+	if !reflect.DeepEqual(body, want) {
+		t.Errorf("Request body: %+v, want %+v", body, want)
+	}
+}
+
 func TestList(t *testing.T) {
 	setup()
 	defer teardown()
@@ -69,6 +76,7 @@ func TestList(t *testing.T) {
 		if got := r.URL.String(); got != want {
 			t.Errorf("URL: got %v, want %v", got, want)
 		}
+
 		fmt.Fprint(w, `{
 		  "total_count":2,
 		  "offset":0,
@@ -214,12 +222,7 @@ func TestCreate(t *testing.T) {
 
 		testMethod(t, r, "POST")
 
-		// test body
-		body := &PlayerRequest{}
-		json.NewDecoder(r.Body).Decode(body)
-		if !reflect.DeepEqual(body, player) {
-			t.Errorf("Request body: %+v, want %+v", body, player)
-		}
+		testBody(t, r, &PlayerRequest{}, player)
 
 		fmt.Fprint(w, `{
 			"success": true,
@@ -276,12 +279,7 @@ func TestUpdate(t *testing.T) {
 
 		testMethod(t, r, "PUT")
 
-		// test body
-		body := &PlayerRequest{}
-		json.NewDecoder(r.Body).Decode(body)
-		if !reflect.DeepEqual(body, player) {
-			t.Errorf("Request body: %+v, want %+v", body, player)
-		}
+		testBody(t, r, &PlayerRequest{}, player)
 
 		fmt.Fprint(w, `{
 			"success": true
