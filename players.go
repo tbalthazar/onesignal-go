@@ -1,7 +1,6 @@
 package onesignal
 
 import (
-	"encoding/json"
 	"fmt"
 	"net/http"
 	"net/url"
@@ -95,25 +94,13 @@ func (s *PlayersService) List(opt *PlayerListOptions) (*PlayerListResponse, *htt
 		return nil, nil, err
 	}
 
-	// send the request
-	resp, err := s.client.Client.Do(req)
-	if err != nil {
-		return nil, nil, err
-	}
-	defer resp.Body.Close()
-
-	err = CheckResponse(resp)
+	plResp := &PlayerListResponse{}
+	resp, err := s.client.Do(req, plResp)
 	if err != nil {
 		return nil, resp, err
 	}
 
-	var plResp PlayerListResponse
-	dec := json.NewDecoder(resp.Body)
-	err = dec.Decode(&plResp)
-	if err != nil {
-		return nil, nil, err
-	}
-	return &plResp, resp, nil
+	return plResp, resp, err
 }
 
 func (s *PlayersService) Create(player *PlayerRequest) (*PlayerCreateResponse, *http.Response, error) {
@@ -129,25 +116,13 @@ func (s *PlayersService) Create(player *PlayerRequest) (*PlayerCreateResponse, *
 		return nil, nil, err
 	}
 
-	// send the request
-	resp, err := s.client.Client.Do(req)
-	if err != nil {
-		return nil, nil, err
-	}
-	defer resp.Body.Close()
-
-	err = CheckResponse(resp)
+	plResp := &PlayerCreateResponse{}
+	resp, err := s.client.Do(req, plResp)
 	if err != nil {
 		return nil, resp, err
 	}
 
-	var plResp PlayerCreateResponse
-	dec := json.NewDecoder(resp.Body)
-	err = dec.Decode(&plResp)
-	if err != nil {
-		return nil, resp, err
-	}
-	return &plResp, resp, nil
+	return plResp, resp, err
 }
 
 func (s *PlayersService) Update(playerID string, player *PlayerRequest) (*PlayerUpdateResponse, *http.Response, error) {
@@ -164,23 +139,11 @@ func (s *PlayersService) Update(playerID string, player *PlayerRequest) (*Player
 		return nil, nil, err
 	}
 
-	// send the request
-	resp, err := s.client.Client.Do(req)
-	if err != nil {
-		return nil, nil, err
-	}
-	defer resp.Body.Close()
-
-	err = CheckResponse(resp)
+	plResp := &PlayerUpdateResponse{}
+	resp, err := s.client.Do(req, plResp)
 	if err != nil {
 		return nil, resp, err
 	}
 
-	var plResp PlayerUpdateResponse
-	dec := json.NewDecoder(resp.Body)
-	err = dec.Decode(&plResp)
-	if err != nil {
-		return nil, resp, err
-	}
-	return &plResp, resp, nil
+	return plResp, resp, err
 }
