@@ -32,6 +32,12 @@ func teardown() {
 	server.Close()
 }
 
+func testMethod(t *testing.T, r *http.Request, want string) {
+	if got := r.Method; got != want {
+		t.Errorf("Request method: %v, want %v", got, want)
+	}
+}
+
 func TestList(t *testing.T) {
 	setup()
 	defer teardown()
@@ -48,11 +54,7 @@ func TestList(t *testing.T) {
 	mux.HandleFunc("/players", func(w http.ResponseWriter, r *http.Request) {
 		requestSent = true
 
-		// test method
-		want := "GET"
-		if got := r.Method; got != want {
-			t.Errorf("Request method: %v, want %v", got, want)
-		}
+		testMethod(t, r, "GET")
 
 		// test URL/query string
 		u, _ := url.Parse("/players")
@@ -63,7 +65,7 @@ func TestList(t *testing.T) {
 		q.Set("limit", strconv.Itoa(opt.Limit))
 		q.Set("offset", strconv.Itoa(opt.Offset))
 		u.RawQuery = q.Encode()
-		want = u.String()
+		want := u.String()
 		if got := r.URL.String(); got != want {
 			t.Errorf("URL: got %v, want %v", got, want)
 		}
@@ -210,11 +212,7 @@ func TestCreate(t *testing.T) {
 	mux.HandleFunc("/players", func(w http.ResponseWriter, r *http.Request) {
 		requestSent = true
 
-		// test method
-		want := "POST"
-		if got := r.Method; got != want {
-			t.Errorf("Request method: %v, want %v", got, want)
-		}
+		testMethod(t, r, "POST")
 
 		// test body
 		body := &PlayerRequest{}
@@ -276,11 +274,7 @@ func TestUpdate(t *testing.T) {
 	mux.HandleFunc("/players/fake-id", func(w http.ResponseWriter, r *http.Request) {
 		requestSent = true
 
-		// test method
-		want := "PUT"
-		if got := r.Method; got != want {
-			t.Errorf("Request method: %v, want %v", got, want)
-		}
+		testMethod(t, r, "PUT")
 
 		// test body
 		body := &PlayerRequest{}
