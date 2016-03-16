@@ -11,18 +11,32 @@ import (
 	"testing"
 )
 
-func TestList(t *testing.T) {
-	requestSent := false
+var (
+	mux    *http.ServeMux
+	server *httptest.Server
+	client *Client
+)
 
+func setup() {
 	// create a test server and a mux
-	mux := http.NewServeMux()
-	server := httptest.NewServer(mux)
-	defer server.Close()
+	mux = http.NewServeMux()
+	server = httptest.NewServer(mux)
 
 	// create a client, giving it the test server URL
-	client := NewClient(nil)
+	client = NewClient(nil)
 	url, _ := url.Parse(server.URL)
 	client.BaseURL = url
+}
+
+func teardown() {
+	server.Close()
+}
+
+func TestList(t *testing.T) {
+	setup()
+	defer teardown()
+
+	requestSent := false
 
 	// PlayerListOptions
 	opt := &PlayerListOptions{
@@ -126,15 +140,8 @@ func TestList(t *testing.T) {
 }
 
 func TestList_returnsError(t *testing.T) {
-	// create a test server and a mux
-	mux := http.NewServeMux()
-	server := httptest.NewServer(mux)
-	defer server.Close()
-
-	// create a client, giving it the test server URL
-	client := NewClient(nil)
-	url, _ := url.Parse(server.URL)
-	client.BaseURL = url
+	setup()
+	defer teardown()
 
 	// PlayerListOptions
 	opt := &PlayerListOptions{
@@ -172,15 +179,8 @@ func TestList_returnsError(t *testing.T) {
 func TestCreate(t *testing.T) {
 	requestSent := false
 
-	// create a test server and a mux
-	mux := http.NewServeMux()
-	server := httptest.NewServer(mux)
-	defer server.Close()
-
-	// create a client, giving it the test server URL
-	client := NewClient(nil)
-	url, _ := url.Parse(server.URL)
-	client.BaseURL = url
+	setup()
+	defer teardown()
 
 	// PlayerRequest
 	player := &PlayerRequest{
@@ -246,15 +246,8 @@ func TestCreate(t *testing.T) {
 func TestUpdate(t *testing.T) {
 	requestSent := false
 
-	// create a test server and a mux
-	mux := http.NewServeMux()
-	server := httptest.NewServer(mux)
-	defer server.Close()
-
-	// create a client, giving it the test server URL
-	client := NewClient(nil)
-	url, _ := url.Parse(server.URL)
-	client.BaseURL = url
+	setup()
+	defer teardown()
 
 	// PlayerRequest
 	player := &PlayerRequest{
