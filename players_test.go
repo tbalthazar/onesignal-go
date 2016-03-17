@@ -107,6 +107,7 @@ func TestList(t *testing.T) {
 		requestSent = true
 
 		testMethod(t, r, "GET")
+		testHeader(t, r, "Authorization", "Basic "+client.AppKey)
 
 		// test URL/query string
 		u, _ := url.Parse("/players")
@@ -195,6 +196,7 @@ func TestCreate(t *testing.T) {
 		requestSent = true
 
 		testMethod(t, r, "POST")
+		testHeader(t, r, "Authorization", "Basic "+client.AppKey)
 
 		testBody(t, r, &PlayerRequest{}, playerRequest)
 
@@ -230,6 +232,7 @@ func TestUpdate(t *testing.T) {
 		requestSent = true
 
 		testMethod(t, r, "PUT")
+		testHeader(t, r, "Authorization", "Basic "+client.AppKey)
 
 		testBody(t, r, &PlayerRequest{}, playerRequest)
 

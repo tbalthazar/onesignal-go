@@ -45,7 +45,7 @@ func (s *AppsService) List() ([]App, *http.Response, error) {
 	}
 
 	// create the request
-	req, err := s.client.NewRequest("GET", u.String(), nil, APP)
+	req, err := s.client.NewRequest("GET", u.String(), nil, USER)
 	if err != nil {
 		return nil, nil, err
 	}

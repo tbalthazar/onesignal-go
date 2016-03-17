@@ -25,6 +25,8 @@ func setup() {
 
 	// create a client, giving it the test server URL
 	client = NewClient(nil)
+	client.AppKey = "fake-app-key"
+	client.UserKey = "fake-user-key"
 	url, _ := url.Parse(server.URL)
 	client.BaseURL = url
 }
@@ -36,6 +38,12 @@ func teardown() {
 func testMethod(t *testing.T, r *http.Request, want string) {
 	if got := r.Method; got != want {
 		t.Errorf("Request method: %v, want %v", got, want)
+	}
+}
+
+func testHeader(t *testing.T, r *http.Request, header string, want string) {
+	if got := r.Header.Get(header); got != want {
+		t.Errorf("NewRequest() %s header is %v, want %v", header, got, want)
 	}
 }
 
@@ -106,20 +114,9 @@ func TestNewRequest(t *testing.T) {
 		t.Errorf("NewRequest(%q) Body is %v, want %v", inBody, got, want)
 	}
 
-	// test Content-Type header
-	if got, want := req.Header.Get("Content-Type"), "application/json"; got != want {
-		t.Errorf("NewRequest() Content-Type header is %v, want %v", got, want)
-	}
-
-	// test Accept header
-	if got, want := req.Header.Get("Accept"), "application/json"; got != want {
-		t.Errorf("NewRequest() Accept header is %v, want %v", got, want)
-	}
-
-	// test Authorization header
-	if got, want := req.Header.Get("Authorization"), "Basic "+appKey; got != want {
-		t.Errorf("NewRequest() Authorization header is %v, want %v", got, want)
-	}
+	testHeader(t, req, "Content-Type", "application/json")
+	testHeader(t, req, "Accept", "application/json")
+	testHeader(t, req, "Authorization", "Basic "+appKey)
 }
 
 func TestNewRequest_userKeyType(t *testing.T) {
@@ -131,10 +128,7 @@ func TestNewRequest_userKeyType(t *testing.T) {
 
 	req, _ := c.NewRequest("GET", "foo", nil, USER)
 
-	// test Authorization header
-	if got, want := req.Header.Get("Authorization"), "Basic "+userKey; got != want {
-		t.Errorf("NewRequest() Authorization header is %v, want %v", got, want)
-	}
+	testHeader(t, req, "Authorization", "Basic "+userKey)
 }
 
 func TestNewRequest_invalidJSON(t *testing.T) {

@@ -135,6 +135,7 @@ func TestAppsService_List(t *testing.T) {
 		requestSent = true
 
 		testMethod(t, r, "GET")
+		testHeader(t, r, "Authorization", "Basic "+client.UserKey)
 
 		fmt.Fprint(w, sampleAppListResponse())
 	})
