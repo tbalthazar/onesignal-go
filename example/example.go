@@ -10,9 +10,22 @@ import (
 )
 
 var (
-	appID  string
-	appKey string
+	appID   string
+	appKey  string
+	userKey string
 )
+
+func ListApps(client *onesignal.Client) {
+	fmt.Println("### ListApps ###")
+
+	apps, res, err := client.Apps.List()
+	if err != nil {
+		fmt.Printf("--- res:%+v, err:%+v\n", res)
+		log.Fatal(err)
+	}
+	fmt.Printf("--- apps:%+v\n", apps)
+	fmt.Println()
+}
 
 func ListPlayers(client *onesignal.Client) {
 	fmt.Println("### ListPlayers ###")
@@ -91,12 +104,18 @@ func main() {
 	}
 	appID = os.Getenv("ONESIGNAL_APP_ID")
 	appKey = os.Getenv("ONESIGNAL_API_KEY")
+	userKey = os.Getenv("ONESIGNAL_USER_AUTH_KEY")
 	client := onesignal.NewClient(nil)
 	client.AppKey = appKey
+	client.UserKey = userKey
 
-	ListPlayers(client)
-	playerID := CreatePlayer(client)
-	ListPlayers(client)
-	UpdatePlayer(playerID, client)
-	ListPlayers(client)
+	// apps
+	ListApps(client)
+
+	// players
+	// ListPlayers(client)
+	// playerID := CreatePlayer(client)
+	// ListPlayers(client)
+	// UpdatePlayer(playerID, client)
+	// ListPlayers(client)
 }
