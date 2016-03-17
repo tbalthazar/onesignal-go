@@ -33,6 +33,19 @@ func teardown() {
 	server.Close()
 }
 
+func testMethod(t *testing.T, r *http.Request, want string) {
+	if got := r.Method; got != want {
+		t.Errorf("Request method: %v, want %v", got, want)
+	}
+}
+
+func testBody(t *testing.T, r *http.Request, body interface{}, want interface{}) {
+	json.NewDecoder(r.Body).Decode(body)
+	if !reflect.DeepEqual(body, want) {
+		t.Errorf("Request body: %+v, want %+v", body, want)
+	}
+}
+
 func TestNewClient(t *testing.T) {
 	c := NewClient(nil)
 
@@ -46,6 +59,10 @@ func TestNewClient(t *testing.T) {
 
 	if got, want := c.Players.client, c; got != want {
 		t.Errorf("NewClient.PlayersService.client is %v, want %v", got, want)
+	}
+
+	if got, want := c.Apps.client, c; got != want {
+		t.Errorf("NewClient.AppsService.client is %v, want %v", got, want)
 	}
 }
 

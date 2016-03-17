@@ -1,7 +1,6 @@
 package onesignal
 
 import (
-	"encoding/json"
 	"fmt"
 	"net/http"
 	"net/url"
@@ -9,19 +8,6 @@ import (
 	"strconv"
 	"testing"
 )
-
-func testMethod(t *testing.T, r *http.Request, want string) {
-	if got := r.Method; got != want {
-		t.Errorf("Request method: %v, want %v", got, want)
-	}
-}
-
-func testBody(t *testing.T, r *http.Request, body interface{}, want interface{}) {
-	json.NewDecoder(r.Body).Decode(body)
-	if !reflect.DeepEqual(body, want) {
-		t.Errorf("Request body: %+v, want %+v", body, want)
-	}
-}
 
 func samplePlayerRequest() *PlayerRequest {
 	return &PlayerRequest{

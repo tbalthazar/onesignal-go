@@ -28,6 +28,7 @@ type Client struct {
 	Client  *http.Client
 
 	Players *PlayersService
+	Apps    *AppsService
 }
 
 type ErrorResponse struct {
@@ -56,6 +57,7 @@ func NewClient(httpClient *http.Client) *Client {
 	}
 
 	c.Players = &PlayersService{client: c}
+	c.Apps = &AppsService{client: c}
 
 	return c
 }
