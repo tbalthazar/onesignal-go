@@ -76,6 +76,21 @@ type PlayerUpdateResponse struct {
 	Success bool `json:"success"`
 }
 
+type PlayerOnSessionOptions struct {
+	Identifier  string            `json:"identifier,omitempty"`
+	Language    string            `json:"language,omitempty"`
+	Timezone    int               `json:"timezone,omitempty"`
+	GameVersion string            `json:"game_version,omitempty"`
+	DeviceOS    string            `json:"device_os,omitempty"`
+	AdID        string            `json:"ad_id,omitempty"`
+	SDK         string            `json:"sdk,omitempty"`
+	Tags        map[string]string `json:"tags,omitempty"`
+}
+
+type PlayerOnSessionResponse struct {
+	Success bool `json:"success"`
+}
+
 func (s *PlayersService) List(opt *PlayerListOptions) (*PlayerListResponse, *http.Response, error) {
 	// build the URL with the query string
 	u, err := url.Parse("/players")
@@ -141,6 +156,29 @@ func (s *PlayersService) Create(player *PlayerRequest) (*PlayerCreateResponse, *
 	}
 
 	plResp := &PlayerCreateResponse{}
+	resp, err := s.client.Do(req, plResp)
+	if err != nil {
+		return nil, resp, err
+	}
+
+	return plResp, resp, err
+}
+
+func (s *PlayersService) OnSession(playerID string, opt *PlayerOnSessionOptions) (*PlayerOnSessionResponse, *http.Response, error) {
+	// build the URL
+	path := fmt.Sprintf("/players/%s/on_session", playerID)
+	u, err := url.Parse(path)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	// create the request
+	req, err := s.client.NewRequest("POST", u.String(), opt, APP)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	plResp := &PlayerOnSessionResponse{}
 	resp, err := s.client.Do(req, plResp)
 	if err != nil {
 		return nil, resp, err

@@ -113,6 +113,22 @@ func samplePlayer() *Player {
 	}
 }
 
+func samplePlayerOnSessionOptions() *PlayerOnSessionOptions {
+	return &PlayerOnSessionOptions{
+		Identifier:  "ce777617da7f548fe7a9ab6febb56cf39fba6d382000c0395666288d961ee566",
+		Language:    "en",
+		Timezone:    -28800,
+		GameVersion: "1.0",
+		DeviceOS:    "7.0.4",
+		AdID:        "fake-ad-id",
+		SDK:         "fake-sdk",
+		Tags: map[string]string{
+			"a":   "1",
+			"foo": "bar",
+		},
+	}
+}
+
 func TestList(t *testing.T) {
 	setup()
 	defer teardown()
@@ -267,6 +283,45 @@ func TestCreate(t *testing.T) {
 	}
 	if !reflect.DeepEqual(want, createRes) {
 		t.Errorf("Request response: %+v, want %+v", createRes, want)
+	}
+
+	if requestSent == false {
+		t.Errorf("Request has not been sent")
+	}
+}
+
+func TestPlayersService_OnSession(t *testing.T) {
+	requestSent := false
+
+	setup()
+	defer teardown()
+
+	opt := samplePlayerOnSessionOptions()
+
+	mux.HandleFunc("/players/id123/on_session", func(w http.ResponseWriter, r *http.Request) {
+		requestSent = true
+
+		testMethod(t, r, "POST")
+		testHeader(t, r, "Authorization", "Basic "+client.AppKey)
+
+		testBody(t, r, &PlayerOnSessionOptions{}, opt)
+
+		fmt.Fprint(w, `{
+			"success": true
+		}`)
+	})
+
+	onSessionRes, _, err := client.Players.OnSession("id123", opt)
+	want := &PlayerOnSessionResponse{
+		Success: true,
+	}
+
+	if err != nil {
+		t.Errorf("Shouldn't have returned an error: %+v", err)
+	}
+
+	if !reflect.DeepEqual(want, onSessionRes) {
+		t.Errorf("Request response: %+v, want %+v", onSessionRes, want)
 	}
 
 	if requestSent == false {
