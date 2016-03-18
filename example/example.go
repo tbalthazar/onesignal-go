@@ -45,6 +45,18 @@ func ListPlayers(client *onesignal.Client) {
 	fmt.Println()
 }
 
+func GetPlayer(playerID string, client *onesignal.Client) {
+	fmt.Println("### GetPlayer " + playerID + " ###")
+
+	player, res, err := client.Players.Get(playerID)
+	if err != nil {
+		fmt.Printf("--- res:%+v, err:%+v\n", res)
+		log.Fatal(err)
+	}
+	fmt.Printf("--- player:%+v\n", player)
+	fmt.Println()
+}
+
 func CreatePlayer(client *onesignal.Client) (playerID string) {
 	fmt.Println("### CreatePlayer ###")
 	player := &onesignal.PlayerRequest{
@@ -110,11 +122,12 @@ func main() {
 	client.UserKey = userKey
 
 	// apps
-	ListApps(client)
+	// ListApps(client)
 
 	// players
 	// ListPlayers(client)
-	// playerID := CreatePlayer(client)
+	playerID := CreatePlayer(client)
+	GetPlayer(playerID, client)
 	// ListPlayers(client)
 	// UpdatePlayer(playerID, client)
 	// ListPlayers(client)
