@@ -94,6 +94,31 @@ func CreatePlayer(client *onesignal.Client) (playerID string) {
 	return createRes.ID
 }
 
+func OnSessionPlayer(playerID string, client *onesignal.Client) {
+	fmt.Println("### OnSessionPlayer " + playerID + " ###")
+	opt := &onesignal.PlayerOnSessionOptions{
+		Identifier:  "ce777617da7f548fe7a9ab6febb56cf39fba6d382000c0395666288d961ee566",
+		Language:    "en",
+		Timezone:    -28800,
+		GameVersion: "1.0",
+		DeviceOS:    "7.0.4",
+		AdID:        "fake-ad-id",
+		SDK:         "fake-sdk",
+		Tags: map[string]string{
+			"a":   "1",
+			"foo": "bar",
+		},
+	}
+
+	onSessionRes, res, err := client.Players.OnSession(playerID, opt)
+	if err != nil {
+		fmt.Printf("--- res:%+v, err:%+v\n", res)
+		log.Fatal(err)
+	}
+	fmt.Printf("--- onSessionRes:%+v\n", onSessionRes)
+	fmt.Println()
+}
+
 func UpdatePlayer(playerID string, client *onesignal.Client) {
 	fmt.Println("### UpdatePlayer " + playerID + " ###")
 	player := &onesignal.PlayerRequest{
@@ -127,6 +152,8 @@ func main() {
 	// players
 	// ListPlayers(client)
 	playerID := CreatePlayer(client)
+	GetPlayer(playerID, client)
+	OnSessionPlayer(playerID, client)
 	GetPlayer(playerID, client)
 	// ListPlayers(client)
 	// UpdatePlayer(playerID, client)
