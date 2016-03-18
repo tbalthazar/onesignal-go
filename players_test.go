@@ -65,6 +65,29 @@ func samplePlayerListResponse() string {
 	}`
 }
 
+func samplePlayerResponse() string {
+	return `{
+		"id": "id123",
+	  "identifier":"ce777617da7f548fe7a9ab6febb56cf39fba6d382000c0395666288d961ee566",
+	  "session_count":1,
+	  "language":"en",
+	  "timezone":-28800,
+	  "game_version":"1.0",
+	  "device_os":"7.0.4",
+	  "device_type":0,
+	  "device_model":"iPhone",
+	  "ad_id":null,
+	  "tags":{"a":"1","foo":"bar"},
+	  "last_active":1395096859,
+		"playtime":0,
+	  "amount_spent":0.0,
+	  "created_at":1395096859,
+	  "invalid_identifier":false,
+	  "badge_count": 0,
+		"sdk": "fake-sdk"
+	}`
+}
+
 func samplePlayer() *Player {
 	return &Player{
 		ID:           "id123",
@@ -181,6 +204,37 @@ func TestList_returnsError(t *testing.T) {
 
 	if got, want := resp.StatusCode, http.StatusBadRequest; want != got {
 		t.Errorf("Status code: %d, want %d", got, want)
+	}
+}
+
+func TestPlayersService_Get(t *testing.T) {
+	setup()
+	defer teardown()
+
+	requestSent := false
+
+	mux.HandleFunc("/players/id123", func(w http.ResponseWriter, r *http.Request) {
+		requestSent = true
+
+		testMethod(t, r, "GET")
+		testHeader(t, r, "Authorization", "Basic "+client.AppKey)
+
+		fmt.Fprint(w, samplePlayerResponse())
+	})
+
+	player, _, err := client.Players.Get("id123")
+	want := samplePlayer()
+
+	if err != nil {
+		t.Errorf("Shouldn't have returned an error: %+v", err)
+	}
+
+	if !reflect.DeepEqual(want, player) {
+		t.Errorf("Request response: %+v, want %+v", player, want)
+	}
+
+	if requestSent == false {
+		t.Errorf("Request has not been sent")
 	}
 }
 

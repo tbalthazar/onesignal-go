@@ -103,6 +103,30 @@ func (s *PlayersService) List(opt *PlayerListOptions) (*PlayerListResponse, *htt
 	return plResp, resp, err
 }
 
+func (s *PlayersService) Get(playerID string) (*Player, *http.Response, error) {
+	// build the URL
+	path := fmt.Sprintf("/players/%s", playerID)
+	u, err := url.Parse(path)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	// create the request
+	req, err := s.client.NewRequest("GET", u.String(), nil, APP)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	plResp := new(Player)
+	resp, err := s.client.Do(req, plResp)
+	if err != nil {
+		return nil, resp, err
+	}
+	plResp.ID = playerID
+
+	return plResp, resp, err
+}
+
 func (s *PlayersService) Create(player *PlayerRequest) (*PlayerCreateResponse, *http.Response, error) {
 	// build the URL
 	u, err := url.Parse("/players")
@@ -126,7 +150,7 @@ func (s *PlayersService) Create(player *PlayerRequest) (*PlayerCreateResponse, *
 }
 
 func (s *PlayersService) Update(playerID string, player *PlayerRequest) (*PlayerUpdateResponse, *http.Response, error) {
-	// build the URL with the query string
+	// build the URL
 	path := fmt.Sprintf("/players/%s", playerID)
 	u, err := url.Parse(path)
 	if err != nil {
