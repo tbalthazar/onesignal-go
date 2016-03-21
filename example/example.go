@@ -145,6 +145,22 @@ func OnPurchasePlayer(playerID string, client *onesignal.Client) {
 	fmt.Println()
 }
 
+func OnFocusPlayer(playerID string, client *onesignal.Client) {
+	fmt.Println("### OnFocusPlayer " + playerID + " ###")
+	opt := &onesignal.PlayerOnFocusOptions{
+		State:      "ping",
+		ActiveTime: 60,
+	}
+
+	onFocusRes, res, err := client.Players.OnFocus(playerID, opt)
+	if err != nil {
+		fmt.Printf("--- res:%+v, err:%+v\n", res)
+		log.Fatal(err)
+	}
+	fmt.Printf("--- onFocusRes:%+v\n", onFocusRes)
+	fmt.Println()
+}
+
 func UpdatePlayer(playerID string, client *onesignal.Client) {
 	fmt.Println("### UpdatePlayer " + playerID + " ###")
 	player := &onesignal.PlayerRequest{
@@ -180,7 +196,8 @@ func main() {
 	playerID := CreatePlayer(client)
 	GetPlayer(playerID, client)
 	// OnSessionPlayer(playerID, client)
-	OnPurchasePlayer(playerID, client)
+	// OnPurchasePlayer(playerID, client)
+	OnFocusPlayer(playerID, client)
 	GetPlayer(playerID, client)
 	// ListPlayers(client)
 	// UpdatePlayer(playerID, client)
