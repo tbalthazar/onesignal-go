@@ -27,6 +27,18 @@ func ListApps(client *onesignal.Client) {
 	fmt.Println()
 }
 
+func GetApps(appID string, client *onesignal.Client) {
+	fmt.Println("### GetApps ###")
+
+	app, res, err := client.Apps.Get(appID)
+	if err != nil {
+		fmt.Printf("--- res:%+v, err:%+v\n", res)
+		log.Fatal(err)
+	}
+	fmt.Printf("--- app:%+v\n", app)
+	fmt.Println()
+}
+
 func ListPlayers(client *onesignal.Client) {
 	fmt.Println("### ListPlayers ###")
 	listOpt := &onesignal.PlayerListOptions{
@@ -205,6 +217,7 @@ func main() {
 
 	// apps
 	// ListApps(client)
+	GetApps(appID, client)
 
 	// players
 	// ListPlayers(client)
@@ -215,7 +228,7 @@ func main() {
 	// OnFocusPlayer(playerID, client)
 	// GetPlayer(playerID, client)
 	// ListPlayers(client)
-	CSVExportPlayer(client)
+	// CSVExportPlayer(client)
 	// UpdatePlayer(playerID, client)
 	// ListPlayers(client)
 }
