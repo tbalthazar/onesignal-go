@@ -79,7 +79,7 @@ func (c *Client) NewRequest(method, path string, body interface{}, authKeyType A
 			return nil, err
 		}
 		buf = b
-		log.Println("Body is: " + b.String())
+		// log.Println("Body is: " + b.String())
 	}
 
 	// create the request
@@ -94,10 +94,10 @@ func (c *Client) NewRequest(method, path string, body interface{}, authKeyType A
 
 	if authKeyType == APP {
 		req.Header.Add("Authorization", "Basic "+c.AppKey)
-		log.Println("Authorization header is AppKey")
+		// log.Println("Authorization header is AppKey")
 	} else {
 		req.Header.Add("Authorization", "Basic "+c.UserKey)
-		log.Println("Authorization header is UserKey")
+		// log.Println("Authorization header is UserKey")
 	}
 
 	return req, nil

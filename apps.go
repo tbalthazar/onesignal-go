@@ -124,3 +124,25 @@ func (s *AppsService) Create(opt *AppRequest) (*App, *http.Response, error) {
 
 	return app, resp, err
 }
+
+func (s *AppsService) Update(appID string, opt *AppRequest) (*App, *http.Response, error) {
+	// build the URL
+	u, err := url.Parse("/apps/" + appID)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	// create the request
+	req, err := s.client.NewRequest("PUT", u.String(), opt, USER)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	app := &App{}
+	resp, err := s.client.Do(req, app)
+	if err != nil {
+		return nil, resp, err
+	}
+
+	return app, resp, err
+}

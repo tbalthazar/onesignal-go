@@ -271,3 +271,37 @@ func TestAppsService_Create(t *testing.T) {
 		t.Errorf("Request has not been sent")
 	}
 }
+
+func TestAppsService_Update(t *testing.T) {
+	setup()
+	defer teardown()
+
+	requestSent := false
+	appRequest := sampleAppRequest()
+	appID := "id123"
+
+	mux.HandleFunc("/apps/"+appID, func(w http.ResponseWriter, r *http.Request) {
+		requestSent = true
+
+		testMethod(t, r, "PUT")
+		testHeader(t, r, "Authorization", "Basic "+client.UserKey)
+
+		testBody(t, r, &AppRequest{}, appRequest)
+
+		fmt.Fprint(w, sampleAppGetResponse())
+	})
+
+	updateRes, _, err := client.Apps.Update(appID, appRequest)
+	if err != nil {
+		t.Errorf("Update returned an error: %v", err)
+	}
+
+	want := sampleApp1()
+	if !reflect.DeepEqual(want, updateRes) {
+		t.Errorf("Request response: %+v, want %+v", updateRes, want)
+	}
+
+	if requestSent == false {
+		t.Errorf("Request has not been sent")
+	}
+}
