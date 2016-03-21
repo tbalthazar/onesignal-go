@@ -161,6 +161,21 @@ func OnFocusPlayer(playerID string, client *onesignal.Client) {
 	fmt.Println()
 }
 
+func CSVExportPlayer(client *onesignal.Client) {
+	fmt.Println("### CSVExportPlayer ###")
+	opt := &onesignal.PlayerCSVExportOptions{
+		AppID: appID,
+	}
+
+	CSVEXportRes, res, err := client.Players.CSVExport(opt)
+	if err != nil {
+		fmt.Printf("--- res:%+v, err:%+v\n", res)
+		log.Fatal(err)
+	}
+	fmt.Printf("--- CSVEXportRes:%+v\n", CSVEXportRes)
+	fmt.Println()
+}
+
 func UpdatePlayer(playerID string, client *onesignal.Client) {
 	fmt.Println("### UpdatePlayer " + playerID + " ###")
 	player := &onesignal.PlayerRequest{
@@ -193,13 +208,14 @@ func main() {
 
 	// players
 	// ListPlayers(client)
-	playerID := CreatePlayer(client)
-	GetPlayer(playerID, client)
+	// playerID := CreatePlayer(client)
+	// GetPlayer(playerID, client)
 	// OnSessionPlayer(playerID, client)
 	// OnPurchasePlayer(playerID, client)
-	OnFocusPlayer(playerID, client)
-	GetPlayer(playerID, client)
+	// OnFocusPlayer(playerID, client)
+	// GetPlayer(playerID, client)
 	// ListPlayers(client)
+	CSVExportPlayer(client)
 	// UpdatePlayer(playerID, client)
 	// ListPlayers(client)
 }
