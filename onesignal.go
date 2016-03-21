@@ -73,11 +73,13 @@ func (c *Client) NewRequest(method, path string, body interface{}, authKeyType A
 	// JSON encode the body
 	var buf io.ReadWriter
 	if body != nil {
-		buf = new(bytes.Buffer)
-		err := json.NewEncoder(buf).Encode(body)
+		b := new(bytes.Buffer)
+		err := json.NewEncoder(b).Encode(body)
 		if err != nil {
 			return nil, err
 		}
+		buf = b
+		log.Println("Body is: " + b.String())
 	}
 
 	// create the request
@@ -92,8 +94,10 @@ func (c *Client) NewRequest(method, path string, body interface{}, authKeyType A
 
 	if authKeyType == APP {
 		req.Header.Add("Authorization", "Basic "+c.AppKey)
+		log.Println("Authorization header is AppKey")
 	} else {
 		req.Header.Add("Authorization", "Basic "+c.UserKey)
+		log.Println("Authorization header is UserKey")
 	}
 
 	return req, nil

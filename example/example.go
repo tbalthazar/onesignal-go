@@ -39,6 +39,23 @@ func GetApps(appID string, client *onesignal.Client) {
 	fmt.Println()
 }
 
+func CreateApps(client *onesignal.Client) string {
+	fmt.Println("### CreateApps ###")
+	app := &onesignal.AppRequest{
+		Name: "Your app 1",
+	}
+	createRes, res, err := client.Apps.Create(app)
+	if err != nil {
+		fmt.Printf("--- res:%+v, err:%+v\n", res)
+		log.Fatal(err)
+	}
+	fmt.Printf("--- createRes:%+v\n", createRes)
+	fmt.Printf("--- appID: %s\n", createRes.ID)
+	fmt.Println()
+
+	return createRes.ID
+}
+
 func ListPlayers(client *onesignal.Client) {
 	fmt.Println("### ListPlayers ###")
 	listOpt := &onesignal.PlayerListOptions{
@@ -217,7 +234,8 @@ func main() {
 
 	// apps
 	// ListApps(client)
-	GetApps(appID, client)
+	// GetApps(appID, client)
+	CreateApps(client)
 
 	// players
 	// ListPlayers(client)
