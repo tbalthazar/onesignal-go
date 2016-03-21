@@ -27,8 +27,9 @@ type Client struct {
 	UserKey string
 	Client  *http.Client
 
-	Players *PlayersService
-	Apps    *AppsService
+	Apps          *AppsService
+	Players       *PlayersService
+	Notifications *NotificationsService
 }
 
 type ErrorResponse struct {
@@ -56,8 +57,9 @@ func NewClient(httpClient *http.Client) *Client {
 		Client:  httpClient,
 	}
 
-	c.Players = &PlayersService{client: c}
 	c.Apps = &AppsService{client: c}
+	c.Players = &PlayersService{client: c}
+	c.Notifications = &NotificationsService{client: c}
 
 	return c
 }

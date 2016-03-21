@@ -72,6 +72,10 @@ func TestNewClient(t *testing.T) {
 	if got, want := c.Apps.client, c; got != want {
 		t.Errorf("NewClient.AppsService.client is %v, want %v", got, want)
 	}
+
+	if got, want := c.Notifications.client, c; got != want {
+		t.Errorf("NewClient.NotificationsService.client is %v, want %v", got, want)
+	}
 }
 
 func TestNewClient_withCustomHTTPClient(t *testing.T) {
