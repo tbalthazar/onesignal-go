@@ -119,6 +119,32 @@ func OnSessionPlayer(playerID string, client *onesignal.Client) {
 	fmt.Println()
 }
 
+func OnPurchasePlayer(playerID string, client *onesignal.Client) {
+	fmt.Println("### OnPurchasePlayer " + playerID + " ###")
+	p1 := onesignal.Purchase{
+		SKU:    "foosku1",
+		Amount: 1.99,
+		ISO:    "BEL",
+	}
+	p2 := onesignal.Purchase{
+		SKU:    "foosku2",
+		Amount: 2.99,
+		ISO:    "GER",
+	}
+	opt := &onesignal.PlayerOnPurchaseOptions{
+		Purchases: []onesignal.Purchase{p1, p2},
+		Existing:  true,
+	}
+
+	onPurchaseRes, res, err := client.Players.OnPurchase(playerID, opt)
+	if err != nil {
+		fmt.Printf("--- res:%+v, err:%+v\n", res)
+		log.Fatal(err)
+	}
+	fmt.Printf("--- onPurchaseRes:%+v\n", onPurchaseRes)
+	fmt.Println()
+}
+
 func UpdatePlayer(playerID string, client *onesignal.Client) {
 	fmt.Println("### UpdatePlayer " + playerID + " ###")
 	player := &onesignal.PlayerRequest{
@@ -153,7 +179,8 @@ func main() {
 	// ListPlayers(client)
 	playerID := CreatePlayer(client)
 	GetPlayer(playerID, client)
-	OnSessionPlayer(playerID, client)
+	// OnSessionPlayer(playerID, client)
+	OnPurchasePlayer(playerID, client)
 	GetPlayer(playerID, client)
 	// ListPlayers(client)
 	// UpdatePlayer(playerID, client)
