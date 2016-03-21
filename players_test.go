@@ -146,6 +146,13 @@ func samplePlayerOnPurchaseOptions() *PlayerOnPurchaseOptions {
 	}
 }
 
+func samplePlayerOnFocusOptions() *PlayerOnFocusOptions {
+	return &PlayerOnFocusOptions{
+		State:      "ping",
+		ActiveTime: 60,
+	}
+}
+
 func TestPlayersService_List(t *testing.T) {
 	setup()
 	defer teardown()
@@ -378,6 +385,45 @@ func TestPlayersService_OnPurchase(t *testing.T) {
 
 	if !reflect.DeepEqual(want, onPurchaseRes) {
 		t.Errorf("Request response: %+v, want %+v", onPurchaseRes, want)
+	}
+
+	if requestSent == false {
+		t.Errorf("Request has not been sent")
+	}
+}
+
+func TestPlayersService_OnFocus(t *testing.T) {
+	requestSent := false
+
+	setup()
+	defer teardown()
+
+	opt := samplePlayerOnFocusOptions()
+
+	mux.HandleFunc("/players/id123/on_focus", func(w http.ResponseWriter, r *http.Request) {
+		requestSent = true
+
+		testMethod(t, r, "POST")
+		testHeader(t, r, "Authorization", "Basic "+client.AppKey)
+
+		testBody(t, r, &PlayerOnFocusOptions{}, opt)
+
+		fmt.Fprint(w, `{
+			"success": true
+		}`)
+	})
+
+	onFocusRes, _, err := client.Players.OnFocus("id123", opt)
+	want := &PlayerOnFocusResponse{
+		Success: true,
+	}
+
+	if err != nil {
+		t.Errorf("Shouldn't have returned an error: %+v", err)
+	}
+
+	if !reflect.DeepEqual(want, onFocusRes) {
+		t.Errorf("Request response: %+v, want %+v", onFocusRes, want)
 	}
 
 	if requestSent == false {

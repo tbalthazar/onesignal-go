@@ -115,6 +115,17 @@ type PlayerOnPurchaseResponse struct {
 	Success bool `json:"success"`
 }
 
+// Options passed to the OnFocus method
+type PlayerOnFocusOptions struct {
+	State      string `json:"state"`
+	ActiveTime int    `json:"active_time"`
+}
+
+// Response from the OnFocus method
+type PlayerOnFocusResponse struct {
+	Success bool `json:"success"`
+}
+
 func (s *PlayersService) List(opt *PlayerListOptions) (*PlayerListResponse, *http.Response, error) {
 	// build the URL with the query string
 	u, err := url.Parse("/players")
@@ -226,6 +237,29 @@ func (s *PlayersService) OnPurchase(playerID string, opt *PlayerOnPurchaseOption
 	}
 
 	plResp := &PlayerOnPurchaseResponse{}
+	resp, err := s.client.Do(req, plResp)
+	if err != nil {
+		return nil, resp, err
+	}
+
+	return plResp, resp, err
+}
+
+func (s *PlayersService) OnFocus(playerID string, opt *PlayerOnFocusOptions) (*PlayerOnFocusResponse, *http.Response, error) {
+	// build the URL
+	path := fmt.Sprintf("/players/%s/on_focus", playerID)
+	u, err := url.Parse(path)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	// create the request
+	req, err := s.client.NewRequest("POST", u.String(), opt, APP)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	plResp := &PlayerOnFocusResponse{}
 	resp, err := s.client.Do(req, plResp)
 	if err != nil {
 		return nil, resp, err
