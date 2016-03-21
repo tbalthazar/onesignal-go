@@ -58,3 +58,25 @@ func (s *AppsService) List() ([]App, *http.Response, error) {
 
 	return *apps, resp, err
 }
+
+func (s *AppsService) Get(appID string) (*App, *http.Response, error) {
+	// build the URL
+	u, err := url.Parse("/apps/" + appID)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	// create the request
+	req, err := s.client.NewRequest("GET", u.String(), nil, USER)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	app := &App{}
+	resp, err := s.client.Do(req, app)
+	if err != nil {
+		return nil, resp, err
+	}
+
+	return app, resp, err
+}
