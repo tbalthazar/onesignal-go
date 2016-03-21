@@ -431,6 +431,57 @@ func TestPlayersService_OnFocus(t *testing.T) {
 	}
 }
 
+func TestPlayersService_CSVExport(t *testing.T) {
+	requestSent := false
+
+	setup()
+	defer teardown()
+
+	opt := &PlayerCSVExportOptions{
+		AppID: "id123",
+	}
+
+	mux.HandleFunc("/players/csv_export", func(w http.ResponseWriter, r *http.Request) {
+		requestSent = true
+
+		testMethod(t, r, "POST")
+		testHeader(t, r, "Authorization", "Basic "+client.AppKey)
+
+		// test URL/query string
+		u, _ := url.Parse("/players/csv_export")
+		u.Scheme = ""
+		u.Host = ""
+		q := u.Query()
+		q.Set("app_id", opt.AppID)
+		u.RawQuery = q.Encode()
+		want := u.String()
+		if got := r.URL.String(); got != want {
+			t.Errorf("URL: got %v, want %v", got, want)
+		}
+
+		fmt.Fprint(w, `{
+			"csv_file_url": "https://example.com/foo.csv"
+		}`)
+	})
+
+	CSVExportRes, _, err := client.Players.CSVExport(opt)
+	want := &PlayerCSVExportResponse{
+		CSVFileURL: "https://example.com/foo.csv",
+	}
+
+	if err != nil {
+		t.Errorf("Shouldn't have returned an error: %+v", err)
+	}
+
+	if !reflect.DeepEqual(want, CSVExportRes) {
+		t.Errorf("Request response: %+v, want %+v", CSVExportRes, want)
+	}
+
+	if requestSent == false {
+		t.Errorf("Request has not been sent")
+	}
+}
+
 func TestPlayersService_Update(t *testing.T) {
 	requestSent := false
 

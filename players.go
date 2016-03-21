@@ -126,6 +126,16 @@ type PlayerOnFocusResponse struct {
 	Success bool `json:"success"`
 }
 
+// Options passed to the CSVExport method
+type PlayerCSVExportOptions struct {
+	AppID string `json:"app_id"`
+}
+
+// Response from the CSVExport method
+type PlayerCSVExportResponse struct {
+	CSVFileURL string `json:"csv_file_url"`
+}
+
 func (s *PlayersService) List(opt *PlayerListOptions) (*PlayerListResponse, *http.Response, error) {
 	// build the URL with the query string
 	u, err := url.Parse("/players")
@@ -260,6 +270,31 @@ func (s *PlayersService) OnFocus(playerID string, opt *PlayerOnFocusOptions) (*P
 	}
 
 	plResp := &PlayerOnFocusResponse{}
+	resp, err := s.client.Do(req, plResp)
+	if err != nil {
+		return nil, resp, err
+	}
+
+	return plResp, resp, err
+}
+
+func (s *PlayersService) CSVExport(opt *PlayerCSVExportOptions) (*PlayerCSVExportResponse, *http.Response, error) {
+	// build the URL with the query string
+	u, err := url.Parse("/players/csv_export")
+	if err != nil {
+		return nil, nil, err
+	}
+	q := u.Query()
+	q.Set("app_id", opt.AppID)
+	u.RawQuery = q.Encode()
+
+	// create the request
+	req, err := s.client.NewRequest("POST", u.String(), opt, APP)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	plResp := &PlayerCSVExportResponse{}
 	resp, err := s.client.Do(req, plResp)
 	if err != nil {
 		return nil, resp, err
