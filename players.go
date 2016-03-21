@@ -54,12 +54,14 @@ type PlayerRequest struct {
 	NotificationTypes string            `json:"notification_types,omitempty"`
 }
 
+// Options passed to the List method
 type PlayerListOptions struct {
 	AppID  string `json:"app_id"`
 	Limit  int    `json:"limit"`
 	Offset int    `json:"offset"`
 }
 
+// Response from the List method
 type PlayerListResponse struct {
 	TotalCount int `json:"total_count"`
 	Offset     int `json:"offset"`
@@ -67,15 +69,18 @@ type PlayerListResponse struct {
 	Players    []Player
 }
 
+// Response from the Create method
 type PlayerCreateResponse struct {
 	Success bool   `json:"success"`
 	ID      string `json:"id"`
 }
 
+// Response from the Update method
 type PlayerUpdateResponse struct {
 	Success bool `json:"success"`
 }
 
+// Options passed to the OnSession method
 type PlayerOnSessionOptions struct {
 	Identifier  string            `json:"identifier,omitempty"`
 	Language    string            `json:"language,omitempty"`
@@ -87,7 +92,26 @@ type PlayerOnSessionOptions struct {
 	Tags        map[string]string `json:"tags,omitempty"`
 }
 
+// Response from the OnSession method
 type PlayerOnSessionResponse struct {
+	Success bool `json:"success"`
+}
+
+// Structure used in options for the OnPurchase method
+type Purchase struct {
+	SKU    string  `json:"sku"`
+	Amount float32 `json:"amount"`
+	ISO    string  `json:"iso"`
+}
+
+// Options passed to the OnPurchase method
+type PlayerOnPurchaseOptions struct {
+	Purchases []Purchase `json:"purchases"`
+	Existing  bool       `json:"existing,omitempty"`
+}
+
+// Response from the OnPurchase method
+type PlayerOnPurchaseResponse struct {
 	Success bool `json:"success"`
 }
 
@@ -179,6 +203,29 @@ func (s *PlayersService) OnSession(playerID string, opt *PlayerOnSessionOptions)
 	}
 
 	plResp := &PlayerOnSessionResponse{}
+	resp, err := s.client.Do(req, plResp)
+	if err != nil {
+		return nil, resp, err
+	}
+
+	return plResp, resp, err
+}
+
+func (s *PlayersService) OnPurchase(playerID string, opt *PlayerOnPurchaseOptions) (*PlayerOnPurchaseResponse, *http.Response, error) {
+	// build the URL
+	path := fmt.Sprintf("/players/%s/on_purchase", playerID)
+	u, err := url.Parse(path)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	// create the request
+	req, err := s.client.NewRequest("POST", u.String(), opt, APP)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	plResp := &PlayerOnPurchaseResponse{}
 	resp, err := s.client.Do(req, plResp)
 	if err != nil {
 		return nil, resp, err

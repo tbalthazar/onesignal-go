@@ -129,7 +129,24 @@ func samplePlayerOnSessionOptions() *PlayerOnSessionOptions {
 	}
 }
 
-func TestList(t *testing.T) {
+func samplePlayerOnPurchaseOptions() *PlayerOnPurchaseOptions {
+	p1 := Purchase{
+		SKU:    "foosku1",
+		Amount: 1.99,
+		ISO:    "BEL",
+	}
+	p2 := Purchase{
+		SKU:    "foosku2",
+		Amount: 2.99,
+		ISO:    "GER",
+	}
+	return &PlayerOnPurchaseOptions{
+		Purchases: []Purchase{p1, p2},
+		Existing:  true,
+	}
+}
+
+func TestPlayersService_List(t *testing.T) {
 	setup()
 	defer teardown()
 
@@ -186,7 +203,7 @@ func TestList(t *testing.T) {
 	}
 }
 
-func TestList_returnsError(t *testing.T) {
+func TestPlayersService_List_returnsError(t *testing.T) {
 	setup()
 	defer teardown()
 
@@ -254,7 +271,7 @@ func TestPlayersService_Get(t *testing.T) {
 	}
 }
 
-func TestCreate(t *testing.T) {
+func TestPlayersService_Create(t *testing.T) {
 	requestSent := false
 
 	setup()
@@ -329,7 +346,46 @@ func TestPlayersService_OnSession(t *testing.T) {
 	}
 }
 
-func TestUpdate(t *testing.T) {
+func TestPlayersService_OnPurchase(t *testing.T) {
+	requestSent := false
+
+	setup()
+	defer teardown()
+
+	opt := samplePlayerOnPurchaseOptions()
+
+	mux.HandleFunc("/players/id123/on_purchase", func(w http.ResponseWriter, r *http.Request) {
+		requestSent = true
+
+		testMethod(t, r, "POST")
+		testHeader(t, r, "Authorization", "Basic "+client.AppKey)
+
+		testBody(t, r, &PlayerOnPurchaseOptions{}, opt)
+
+		fmt.Fprint(w, `{
+			"success": true
+		}`)
+	})
+
+	onPurchaseRes, _, err := client.Players.OnPurchase("id123", opt)
+	want := &PlayerOnPurchaseResponse{
+		Success: true,
+	}
+
+	if err != nil {
+		t.Errorf("Shouldn't have returned an error: %+v", err)
+	}
+
+	if !reflect.DeepEqual(want, onPurchaseRes) {
+		t.Errorf("Request response: %+v, want %+v", onPurchaseRes, want)
+	}
+
+	if requestSent == false {
+		t.Errorf("Request has not been sent")
+	}
+}
+
+func TestPlayersService_Update(t *testing.T) {
 	requestSent := false
 
 	setup()
