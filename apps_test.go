@@ -154,6 +154,30 @@ func sampleApp2() *App {
 	}
 }
 
+func sampleAppRequest() *AppRequest {
+	return &AppRequest{
+		Name:                             "Your app 1",
+		GCMKey:                           "a gcm push key",
+		ChromeKey:                        "A Chrome Web Push GCM key",
+		ChromeWebOrigin:                  "Chrome Web Push Site URL",
+		ChromeWebGCMSenderID:             "Chrome Web Push GCM Sender ID",
+		ChromeWebDefaultNotificationIcon: "http://yoursite.com/chrome_notification_icon",
+		ChromeWebSubDomain:               "your_site_name",
+		APNSEnv:                          "sandbox",
+		APNSCertificates:                 "Your apns certificate",
+		SafariAPNSCertificate:            "Your Safari APNS certificate",
+		SafariSiteOrigin:                 "The homename for your website for Safari Push, including http or https",
+		SafariPushID:                     "The certificate bundle ID for Safari Web Push",
+		SafariIcon1616:                   "http://onesignal.com/safari_packages/92911750-242d-4260-9e00-9d9034f139ce/16x16.png",
+		SafariIcon3232:                   "http://onesignal.com/safari_packages/92911750-242d-4260-9e00-9d9034f139ce/16x16@2.png",
+		SafariIcon6464:                   "http://onesignal.com/safari_packages/92911750-242d-4260-9e00-9d9034f139ce/32x32@2x.png",
+		SafariIcon128128:                 "http://onesignal.com/safari_packages/92911750-242d-4260-9e00-9d9034f139ce/128x128.png",
+		SafariIcon256256:                 "http://onesignal.com/safari_packages/92911750-242d-4260-9e00-9d9034f139ce/128x128@2x.png",
+		SiteName:                         "The URL to your website for Web Push",
+		BasicAuthKey:                     "NGEwMGZmMjItY2NkNy0xMWUzLTk5ZDUtMDAwYzI5NDBlNjJj",
+	}
+}
+
 func TestAppsService_List(t *testing.T) {
 	setup()
 	defer teardown()
@@ -208,6 +232,39 @@ func TestAppsService_Get(t *testing.T) {
 	want := sampleApp1()
 	if !reflect.DeepEqual(app, want) {
 		t.Errorf("Get returned %+v, want %+v", app, want)
+	}
+
+	if requestSent == false {
+		t.Errorf("Request has not been sent")
+	}
+}
+
+func TestAppsService_Create(t *testing.T) {
+	setup()
+	defer teardown()
+
+	requestSent := false
+	appRequest := sampleAppRequest()
+
+	mux.HandleFunc("/apps", func(w http.ResponseWriter, r *http.Request) {
+		requestSent = true
+
+		testMethod(t, r, "POST")
+		testHeader(t, r, "Authorization", "Basic "+client.UserKey)
+
+		testBody(t, r, &AppRequest{}, appRequest)
+
+		fmt.Fprint(w, sampleAppGetResponse())
+	})
+
+	createRes, _, err := client.Apps.Create(appRequest)
+	if err != nil {
+		t.Errorf("Create returned an error: %v", err)
+	}
+
+	want := sampleApp1()
+	if !reflect.DeepEqual(want, createRes) {
+		t.Errorf("Request response: %+v, want %+v", createRes, want)
 	}
 
 	if requestSent == false {
