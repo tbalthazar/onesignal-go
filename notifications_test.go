@@ -63,6 +63,32 @@ func sampleNotificationListResponse() string {
 	}`
 }
 
+func sampleNotificationGetResponse() string {
+	return `{
+	     "id":"b6b326a8-40aa-13e5-b91b-bf8bc3fa26f7",
+	     "successful":5,
+	     "failed":2,
+	     "converted":0,
+	     "remaining":0,
+	     "queued_at":1415915123,
+	     "send_after":1415915123,
+	     "canceled": false,
+			 "url": null,
+	     "data":{
+	       "foo":"bar",
+	       "your":"custom metadata"
+	     },
+	     "headings":{
+	       "en":"English and default langauge heading",
+	       "es":"Spanish language heading"
+	     },
+	     "contents":{
+	       "en":"English and default content",
+	       "es":"Hola"
+	     }
+	    }`
+}
+
 func sampleNotification1() *Notification {
 	return &Notification{
 		ID:         "481a2734-6b7d-11e4-a6ea-4b53294fa671",
@@ -163,6 +189,53 @@ func TestNotificationsService_List(t *testing.T) {
 	}
 	if !reflect.DeepEqual(listRes, want) {
 		t.Errorf("List returned %+v, want %+v", listRes, want)
+	}
+
+	if requestSent == false {
+		t.Errorf("Request has not been sent")
+	}
+}
+
+func TestNotificationsService_Get(t *testing.T) {
+	setup()
+	defer teardown()
+
+	requestSent := false
+
+	// NotificationGetOptions
+	opt := &NotificationGetOptions{
+		AppID: "fake-app-id",
+	}
+	notification := sampleNotification2()
+
+	mux.HandleFunc("/notifications/"+notification.ID, func(w http.ResponseWriter, r *http.Request) {
+		requestSent = true
+
+		testMethod(t, r, "GET")
+		testHeader(t, r, "Authorization", "Basic "+client.AppKey)
+
+		// test URL/query string
+		u, _ := url.Parse("/notifications/" + notification.ID)
+		u.Scheme = ""
+		u.Host = ""
+		q := u.Query()
+		q.Set("app_id", opt.AppID)
+		u.RawQuery = q.Encode()
+		want := u.String()
+		if got := r.URL.String(); got != want {
+			t.Errorf("URL: got %v, want %v", got, want)
+		}
+
+		fmt.Fprint(w, sampleNotificationGetResponse())
+	})
+
+	getRes, _, err := client.Notifications.Get(notification.ID, opt)
+	if err != nil {
+		t.Errorf("Get returned an error: %v", err)
+	}
+
+	if !reflect.DeepEqual(getRes, notification) {
+		t.Errorf("Get returned %+v, want %+v", getRes, notification)
 	}
 
 	if requestSent == false {

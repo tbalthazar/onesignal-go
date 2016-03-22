@@ -40,6 +40,11 @@ type NotificationListResponse struct {
 	Notifications []Notification
 }
 
+// Options passed to the Get method
+type NotificationGetOptions struct {
+	AppID string `json:"app_id"`
+}
+
 func (s *NotificationsService) List(opt *NotificationListOptions) (*NotificationListResponse, *http.Response, error) {
 	// build the URL with the query string
 	u, err := url.Parse("/notifications")
@@ -65,4 +70,29 @@ func (s *NotificationsService) List(opt *NotificationListOptions) (*Notification
 	}
 
 	return notifResp, resp, err
+}
+
+func (s *NotificationsService) Get(notificationID string, opt *NotificationGetOptions) (*Notification, *http.Response, error) {
+	// build the URL with the query string
+	u, err := url.Parse("/notifications/" + notificationID)
+	if err != nil {
+		return nil, nil, err
+	}
+	q := u.Query()
+	q.Set("app_id", opt.AppID)
+	u.RawQuery = q.Encode()
+
+	// create the request
+	req, err := s.client.NewRequest("GET", u.String(), nil, APP)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	notif := &Notification{}
+	resp, err := s.client.Do(req, notif)
+	if err != nil {
+		return nil, resp, err
+	}
+
+	return notif, resp, err
 }
