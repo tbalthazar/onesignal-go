@@ -118,6 +118,11 @@ func (c *Client) Do(r *http.Request, v interface{}) (*http.Response, error) {
 		return resp, err
 	}
 
+	// // log body for debug
+	// b := new(bytes.Buffer)
+	// b.ReadFrom(resp.Body)
+	// log.Println("response body: ", b.String())
+
 	dec := json.NewDecoder(resp.Body)
 	err = dec.Decode(&v)
 	if err != nil {

@@ -74,7 +74,6 @@ func sampleNotification1() *Notification {
 		SendAfter:  1415914655,
 		Canceled:   false,
 		URL:        "https://yourWebsiteToOpen.com",
-		Data:       nil,
 		Headings: map[string]string{
 			"en": "English and default langauge heading",
 			"es": "Spanish language heading",
@@ -87,6 +86,11 @@ func sampleNotification1() *Notification {
 }
 
 func sampleNotification2() *Notification {
+	var data interface{}
+	data = map[string]interface{}{
+		"foo":  "bar",
+		"your": "custom metadata",
+	}
 	return &Notification{
 		ID:         "b6b326a8-40aa-13e5-b91b-bf8bc3fa26f7",
 		Successful: 5,
@@ -96,11 +100,7 @@ func sampleNotification2() *Notification {
 		QueuedAt:   1415915123,
 		SendAfter:  1415915123,
 		Canceled:   false,
-		// URL:        nil,
-		Data: map[string]string{
-			"foo":  "bar",
-			"your": "custom metadata",
-		},
+		Data:       data,
 		Headings: map[string]string{
 			"en": "English and default langauge heading",
 			"es": "Spanish language heading",

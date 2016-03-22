@@ -234,6 +234,24 @@ func UpdatePlayer(playerID string, client *onesignal.Client) {
 	fmt.Println()
 }
 
+func ListNotifications(client *onesignal.Client) {
+	fmt.Println("### ListNotifications ###")
+	listOpt := &onesignal.NotificationListOptions{
+		AppID:  appID,
+		Limit:  10,
+		Offset: 0,
+	}
+
+	listRes, res, err := client.Notifications.List(listOpt)
+	if err != nil {
+		fmt.Printf("--- res:%+v, err:%+v\n", res)
+		log.Fatal(err)
+	}
+	fmt.Printf("--- listRes:%+v\n", listRes)
+	fmt.Printf("--- nbNotifications: %d\n", len(listRes.Notifications))
+	fmt.Println()
+}
+
 func main() {
 	err := godotenv.Load()
 	if err != nil {
@@ -266,4 +284,7 @@ func main() {
 	// CSVExportPlayer(client)
 	// UpdatePlayer(playerID, client)
 	// ListPlayers(client)
+
+	// notifications
+	ListNotifications(client)
 }

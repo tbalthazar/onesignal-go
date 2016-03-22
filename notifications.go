@@ -19,7 +19,7 @@ type Notification struct {
 	QueuedAt   int               `json:"queued_at"`
 	SendAfter  int               `json:"send_after"`
 	URL        string            `json:"url"`
-	Data       map[string]string `json:"data"`
+	Data       interface{}       `json:"data"`
 	Canceled   bool              `json:"canceled"`
 	Headings   map[string]string `json:"headings"`
 	Contents   map[string]string `json:"contents"`
