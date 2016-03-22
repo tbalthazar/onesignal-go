@@ -234,7 +234,7 @@ func UpdatePlayer(playerID string, client *onesignal.Client) {
 	fmt.Println()
 }
 
-func ListNotifications(client *onesignal.Client) {
+func ListNotifications(client *onesignal.Client) []onesignal.Notification {
 	fmt.Println("### ListNotifications ###")
 	listOpt := &onesignal.NotificationListOptions{
 		AppID:  appID,
@@ -250,6 +250,23 @@ func ListNotifications(client *onesignal.Client) {
 	fmt.Printf("--- listRes:%+v\n", listRes)
 	fmt.Printf("--- nbNotifications: %d\n", len(listRes.Notifications))
 	fmt.Println()
+	return listRes.Notifications
+}
+
+func GetNotifications(notificationID string, client *onesignal.Client) *onesignal.Notification {
+	fmt.Println("### GetNotifications " + notificationID + " ###")
+	opt := &onesignal.NotificationGetOptions{
+		AppID: appID,
+	}
+
+	getRes, res, err := client.Notifications.Get(notificationID, opt)
+	if err != nil {
+		fmt.Printf("--- res:%+v, err:%+v\n", res)
+		log.Fatal(err)
+	}
+	fmt.Printf("--- getRes:%+v\n", getRes)
+	fmt.Println()
+	return getRes
 }
 
 func main() {
@@ -286,5 +303,6 @@ func main() {
 	// ListPlayers(client)
 
 	// notifications
-	ListNotifications(client)
+	notif := ListNotifications(client)[0]
+	GetNotifications(notif.ID, client)
 }
