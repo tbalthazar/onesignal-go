@@ -138,6 +138,15 @@ func sampleNotification2() *Notification {
 	}
 }
 
+func sampleNotificationRequest() *NotificationRequest {
+	return &NotificationRequest{
+		AppID:            "id123",
+		Contents:         map[string]string{"en": "English message"},
+		IsIOS:            true,
+		IncludePlayerIDs: []string{"playerid123"},
+	}
+}
+
 func TestNotificationsService_List(t *testing.T) {
 	setup()
 	defer teardown()
@@ -236,6 +245,46 @@ func TestNotificationsService_Get(t *testing.T) {
 
 	if !reflect.DeepEqual(getRes, notification) {
 		t.Errorf("Get returned %+v, want %+v", getRes, notification)
+	}
+
+	if requestSent == false {
+		t.Errorf("Request has not been sent")
+	}
+}
+
+func TestNotificationsService_Create(t *testing.T) {
+	setup()
+	defer teardown()
+
+	requestSent := false
+
+	notificationRequest := sampleNotificationRequest()
+
+	mux.HandleFunc("/notifications", func(w http.ResponseWriter, r *http.Request) {
+		requestSent = true
+
+		testMethod(t, r, "POST")
+		testHeader(t, r, "Authorization", "Basic "+client.AppKey)
+
+		testBody(t, r, &NotificationRequest{}, notificationRequest)
+
+		fmt.Fprint(w, `{
+			"id": "notif-fake-id",
+			"recipients": 1
+		}`)
+	})
+
+	want := &NotificationCreateResponse{
+		ID:         "notif-fake-id",
+		Recipients: 1,
+	}
+	createRes, _, err := client.Notifications.Create(notificationRequest)
+	if err != nil {
+		t.Errorf("Create returned an error: %v", err)
+	}
+
+	if !reflect.DeepEqual(createRes, want) {
+		t.Errorf("Get returned %+v, want %+v", createRes, want)
 	}
 
 	if requestSent == false {

@@ -38,7 +38,7 @@ type App struct {
 }
 
 type AppRequest struct {
-	Name                             string `json:"name",omitempty`
+	Name                             string `json:"name,omitempty"`
 	GCMKey                           string `json:"gcm_key,omitempty"`
 	ChromeKey                        string `json:"chrome_key,omitempty"`
 	ChromeWebOrigin                  string `json:"chrome_web_origin,omitempty"`
