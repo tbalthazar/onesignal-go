@@ -291,3 +291,108 @@ func TestNotificationsService_Create(t *testing.T) {
 		t.Errorf("Request has not been sent")
 	}
 }
+
+func TestNotificationsService_Create_returnsError(t *testing.T) {
+	setup()
+	defer teardown()
+
+	notificationRequest := sampleNotificationRequest()
+
+	mux.HandleFunc("/notifications", func(w http.ResponseWriter, r *http.Request) {
+		w.WriteHeader(http.StatusBadRequest)
+		fmt.Fprint(w, `{
+		  "errors":
+		  [
+				"Notification content must not be null for any languages."
+		  ]
+			}`)
+	})
+
+	_, resp, err := client.Notifications.Create(notificationRequest)
+	errResp, ok := err.(*ErrorResponse)
+	if !ok {
+		t.Errorf("Error should be of type ErrorResponse but is %v: %+v", reflect.TypeOf(err), err)
+	}
+
+	want := "Notification content must not be null for any languages."
+	if got := errResp.Messages[0]; want != got {
+		t.Errorf("Error message: %v, want %v", got, want)
+	}
+
+	if got, want := resp.StatusCode, http.StatusBadRequest; want != got {
+		t.Errorf("Status code: %d, want %d", got, want)
+	}
+}
+
+func TestNotificationsService_Create_invalidPlayerIds(t *testing.T) {
+	setup()
+	defer teardown()
+
+	notificationRequest := sampleNotificationRequest()
+
+	mux.HandleFunc("/notifications", func(w http.ResponseWriter, r *http.Request) {
+		w.WriteHeader(http.StatusOK)
+		fmt.Fprint(w, `{
+			"errors": {
+				"invalid_player_ids" : [
+					"5fdc92b2-3b2a-11e5-ac13-8fdccfe4d986",
+					"00cb73f8-5815-11e5-ba69-f75522da5528"
+				]
+			}
+		}`)
+	})
+
+	createResp, _, err := client.Notifications.Create(notificationRequest)
+	if err != nil {
+		t.Errorf("Create returned an error: %v", err)
+	}
+
+	ids := []interface{}{
+		"5fdc92b2-3b2a-11e5-ac13-8fdccfe4d986",
+		"00cb73f8-5815-11e5-ba69-f75522da5528",
+	}
+	errors := map[string]interface{}{
+		"invalid_player_ids": ids,
+	}
+	want := &NotificationCreateResponse{
+		Errors: errors,
+	}
+	if !reflect.DeepEqual(createResp, want) {
+		t.Errorf("Errors: %v, want %v", createResp, want)
+	}
+}
+
+func TestNotificationsService_Create_noSubscribedPlayers(t *testing.T) {
+	setup()
+	defer teardown()
+
+	notificationRequest := sampleNotificationRequest()
+
+	mux.HandleFunc("/notifications", func(w http.ResponseWriter, r *http.Request) {
+		w.WriteHeader(http.StatusOK)
+		fmt.Fprint(w, `{
+			"id": "",
+			"recipients": 0,
+			"errors": [
+				"All included players are not subscribed"
+			]
+		}`)
+	})
+
+	createResp, _, err := client.Notifications.Create(notificationRequest)
+	if err != nil {
+		t.Errorf("Create returned an error: %v", err)
+	}
+
+	errors := []interface{}{
+		"All included players are not subscribed",
+	}
+	want := &NotificationCreateResponse{
+		ID:         "",
+		Recipients: 0,
+		Errors:     errors,
+	}
+	if !reflect.DeepEqual(createResp, want) {
+		t.Errorf("Errors: %v, want %v", createResp, want)
+	}
+}

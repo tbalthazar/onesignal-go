@@ -86,8 +86,9 @@ type NotificationRequest struct {
 }
 
 type NotificationCreateResponse struct {
-	ID         string `json:"id"`
-	Recipients int    `json:"recipients"`
+	ID         string      `json:"id"`
+	Recipients int         `json:"recipients"`
+	Errors     interface{} `json:"errors"`
 }
 
 // Options passed to the List method
