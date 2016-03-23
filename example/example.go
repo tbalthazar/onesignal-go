@@ -269,6 +269,24 @@ func GetNotifications(notificationID string, client *onesignal.Client) *onesigna
 	return getRes
 }
 
+func CreateNotifications(client *onesignal.Client) {
+	fmt.Println("### CreateNotifications ###")
+	notificationReq := &onesignal.NotificationRequest{
+		AppID:            appID,
+		Contents:         map[string]string{"en": "English message"},
+		IsIOS:            true,
+		IncludePlayerIDs: []string{"83823c5f-53ce-4e35-be6a-a3f27e5d838f"},
+	}
+
+	createRes, res, err := client.Notifications.Create(notificationReq)
+	if err != nil {
+		fmt.Printf("--- res:%+v, err:%+v\n", res)
+		log.Fatal(err)
+	}
+	fmt.Printf("--- createRes:%+v\n", createRes)
+	fmt.Println()
+}
+
 func main() {
 	err := godotenv.Load()
 	if err != nil {
@@ -303,6 +321,7 @@ func main() {
 	// ListPlayers(client)
 
 	// notifications
-	notif := ListNotifications(client)[0]
-	GetNotifications(notif.ID, client)
+	// notif := ListNotifications(client)[0]
+	// GetNotifications(notif.ID, client)
+	CreateNotifications(client)
 }
