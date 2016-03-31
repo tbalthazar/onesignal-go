@@ -269,13 +269,15 @@ func GetNotifications(notificationID string, client *onesignal.Client) *onesigna
 	return getRes
 }
 
-func CreateNotifications(client *onesignal.Client) {
+func CreateNotifications(client *onesignal.Client) string {
 	fmt.Println("### CreateNotifications ###")
+	playerID := "6c54762c-4daa-4166-8aa4-1c7f0b1ad78b" // valid
+	// playerID := "83823c5f-53ce-4e35-be6a-a3f27e5d838f" // invalid
 	notificationReq := &onesignal.NotificationRequest{
 		AppID:            appID,
 		Contents:         map[string]string{"en": "English message"},
 		IsIOS:            true,
-		IncludePlayerIDs: []string{"83823c5f-53ce-4e35-be6a-a3f27e5d838f"},
+		IncludePlayerIDs: []string{playerID},
 	}
 
 	createRes, res, err := client.Notifications.Create(notificationReq)
@@ -284,6 +286,24 @@ func CreateNotifications(client *onesignal.Client) {
 		log.Fatal(err)
 	}
 	fmt.Printf("--- createRes:%+v\n", createRes)
+	fmt.Println()
+
+	return createRes.ID
+}
+
+func UpdateNotifications(notificationID string, client *onesignal.Client) {
+	fmt.Println("### UpdateNotifications " + notificationID + " ###")
+	opt := &onesignal.NotificationUpdateOptions{
+		AppID:  appID,
+		Opened: true,
+	}
+
+	updateRes, res, err := client.Notifications.Update(notificationID, opt)
+	if err != nil {
+		fmt.Printf("--- res:%+v, err:%+v\n", res)
+		log.Fatal(err)
+	}
+	fmt.Printf("--- updateRes:%+v\n", updateRes)
 	fmt.Println()
 }
 
@@ -323,5 +343,8 @@ func main() {
 	// notifications
 	// notif := ListNotifications(client)[0]
 	// GetNotifications(notif.ID, client)
-	CreateNotifications(client)
+	notifID := CreateNotifications(client)
+	GetNotifications(notifID, client)
+	UpdateNotifications(notifID, client)
+	GetNotifications(notifID, client)
 }
