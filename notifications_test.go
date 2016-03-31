@@ -396,3 +396,45 @@ func TestNotificationsService_Create_noSubscribedPlayers(t *testing.T) {
 		t.Errorf("Errors: %v, want %v", createResp, want)
 	}
 }
+
+func TestNotificationsService_Update(t *testing.T) {
+	setup()
+	defer teardown()
+
+	requestSent := false
+
+	notifID := "notif-fake-id"
+	opt := &NotificationUpdateOptions{
+		AppID:  "id123",
+		Opened: true,
+	}
+
+	mux.HandleFunc("/notifications/"+notifID, func(w http.ResponseWriter, r *http.Request) {
+		requestSent = true
+
+		testMethod(t, r, "PUT")
+		testHeader(t, r, "Authorization", "Basic "+client.AppKey)
+
+		testBody(t, r, &NotificationUpdateOptions{}, opt)
+
+		fmt.Fprint(w, `{
+			"success": true
+		}`)
+	})
+
+	want := &NotificationUpdateResponse{
+		Success: true,
+	}
+	updateRes, _, err := client.Notifications.Update(notifID, opt)
+	if err != nil {
+		t.Errorf("Update returned an error: %v", err)
+	}
+
+	if !reflect.DeepEqual(updateRes, want) {
+		t.Errorf("Get returned %+v, want %+v", updateRes, want)
+	}
+
+	if requestSent == false {
+		t.Errorf("Request has not been sent")
+	}
+}

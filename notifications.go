@@ -111,6 +111,17 @@ type NotificationGetOptions struct {
 	AppID string `json:"app_id"`
 }
 
+// Options passed to the Update method
+type NotificationUpdateOptions struct {
+	AppID  string `json:"app_id"`
+	Opened bool   `json:"opened"`
+}
+
+// Response from the Update method
+type NotificationUpdateResponse struct {
+	Success bool `json:"success"`
+}
+
 func (s *NotificationsService) List(opt *NotificationListOptions) (*NotificationListResponse, *http.Response, error) {
 	// build the URL with the query string
 	u, err := url.Parse("/notifications")
@@ -183,4 +194,26 @@ func (s *NotificationsService) Create(opt *NotificationRequest) (*NotificationCr
 	}
 
 	return createRes, resp, err
+}
+
+func (s *NotificationsService) Update(notificationID string, opt *NotificationUpdateOptions) (*NotificationUpdateResponse, *http.Response, error) {
+	// build the URL
+	u, err := url.Parse("/notifications/" + notificationID)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	// create the request
+	req, err := s.client.NewRequest("PUT", u.String(), opt, APP)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	updateRes := &NotificationUpdateResponse{}
+	resp, err := s.client.Do(req, updateRes)
+	if err != nil {
+		return nil, resp, err
+	}
+
+	return updateRes, resp, err
 }
