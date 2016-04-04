@@ -122,6 +122,16 @@ type NotificationUpdateResponse struct {
 	Success bool `json:"success"`
 }
 
+// Options passed to the Delete method
+type NotificationDeleteOptions struct {
+	AppID string `json:"app_id"`
+}
+
+// Response from the Delete method
+type NotificationDeleteResponse struct {
+	Success bool `json:"success"`
+}
+
 func (s *NotificationsService) List(opt *NotificationListOptions) (*NotificationListResponse, *http.Response, error) {
 	// build the URL with the query string
 	u, err := url.Parse("/notifications")
@@ -216,4 +226,26 @@ func (s *NotificationsService) Update(notificationID string, opt *NotificationUp
 	}
 
 	return updateRes, resp, err
+}
+
+func (s *NotificationsService) Delete(notificationID string, opt *NotificationDeleteOptions) (*NotificationDeleteResponse, *http.Response, error) {
+	// build the URL
+	u, err := url.Parse("/notifications/" + notificationID)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	// create the request
+	req, err := s.client.NewRequest("DELETE", u.String(), opt, APP)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	deleteRes := &NotificationDeleteResponse{}
+	resp, err := s.client.Do(req, deleteRes)
+	if err != nil {
+		return nil, resp, err
+	}
+
+	return deleteRes, resp, err
 }

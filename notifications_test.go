@@ -438,3 +438,44 @@ func TestNotificationsService_Update(t *testing.T) {
 		t.Errorf("Request has not been sent")
 	}
 }
+
+func TestNotificationsService_Delete(t *testing.T) {
+	setup()
+	defer teardown()
+
+	requestSent := false
+
+	notifID := "notif-fake-id"
+	opt := &NotificationDeleteOptions{
+		AppID: "id123",
+	}
+
+	mux.HandleFunc("/notifications/"+notifID, func(w http.ResponseWriter, r *http.Request) {
+		requestSent = true
+
+		testMethod(t, r, "DELETE")
+		testHeader(t, r, "Authorization", "Basic "+client.AppKey)
+
+		testBody(t, r, &NotificationDeleteOptions{}, opt)
+
+		fmt.Fprint(w, `{
+			"success": true
+		}`)
+	})
+
+	want := &NotificationDeleteResponse{
+		Success: true,
+	}
+	deleteRes, _, err := client.Notifications.Delete(notifID, opt)
+	if err != nil {
+		t.Errorf("Delete returned an error: %v", err)
+	}
+
+	if !reflect.DeepEqual(deleteRes, want) {
+		t.Errorf("Delete returned %+v, want %+v", deleteRes, want)
+	}
+
+	if requestSent == false {
+		t.Errorf("Request has not been sent")
+	}
+}
