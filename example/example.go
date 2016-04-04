@@ -307,6 +307,21 @@ func UpdateNotifications(notificationID string, client *onesignal.Client) {
 	fmt.Println()
 }
 
+func DeleteNotifications(notificationID string, client *onesignal.Client) {
+	fmt.Println("### DeleteNotifications " + notificationID + " ###")
+	opt := &onesignal.NotificationDeleteOptions{
+		AppID: appID,
+	}
+
+	deleteRes, res, err := client.Notifications.Delete(notificationID, opt)
+	if err != nil {
+		fmt.Printf("--- res:%+v, err:%+v\n", res)
+		log.Fatal(err)
+	}
+	fmt.Printf("--- deleteRes:%+v\n", deleteRes)
+	fmt.Println()
+}
+
 func main() {
 	err := godotenv.Load()
 	if err != nil {
@@ -344,7 +359,8 @@ func main() {
 	// notif := ListNotifications(client)[0]
 	// GetNotifications(notif.ID, client)
 	notifID := CreateNotifications(client)
-	GetNotifications(notifID, client)
-	UpdateNotifications(notifID, client)
-	GetNotifications(notifID, client)
+	// GetNotifications(notifID, client)
+	// UpdateNotifications(notifID, client)
+	// GetNotifications(notifID, client)
+	DeleteNotifications(notifID, client)
 }
