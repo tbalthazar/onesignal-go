@@ -459,12 +459,12 @@ func TestNotificationsService_Delete(t *testing.T) {
 		testBody(t, r, &NotificationDeleteOptions{}, opt)
 
 		fmt.Fprint(w, `{
-			"success": "true"
+			"success": true
 		}`)
 	})
 
 	want := &NotificationDeleteResponse{
-		Success: "true",
+		Success: true,
 	}
 	deleteRes, _, err := client.Notifications.Delete(notifID, opt)
 	if err != nil {

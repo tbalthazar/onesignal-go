@@ -129,7 +129,7 @@ type NotificationDeleteOptions struct {
 
 // Response from the Delete method
 type NotificationDeleteResponse struct {
-	Success string `json:"success"`
+	Success bool `json:"success"`
 }
 
 func (s *NotificationsService) List(opt *NotificationListOptions) (*NotificationListResponse, *http.Response, error) {
