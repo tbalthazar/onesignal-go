@@ -7,10 +7,13 @@ import (
 	"strconv"
 )
 
+// PlayersService handles communication with the player related
+// methods of the OneSignal API.
 type PlayersService struct {
 	client *Client
 }
 
+// Player represents a OneSignal player.
 type Player struct {
 	ID                string            `json:"id"`
 	Playtime          int               `json:"playtime"`
@@ -32,6 +35,7 @@ type Player struct {
 	BadgeCount        int               `json:"badge_count"`
 }
 
+// PlayerRequest represents a request to create/update a player.
 type PlayerRequest struct {
 	AppID             string            `json:"app_id,omitempty"`
 	DeviceType        int               `json:"device_type,omitempty"`
@@ -54,14 +58,15 @@ type PlayerRequest struct {
 	NotificationTypes string            `json:"notification_types,omitempty"`
 }
 
-// Options passed to the List method
+// PlayerListOptions specifies the parameters to the PlayersService.List method
 type PlayerListOptions struct {
 	AppID  string `json:"app_id"`
 	Limit  int    `json:"limit"`
 	Offset int    `json:"offset"`
 }
 
-// Response from the List method
+// PlayerListResponse wraps the standard http.Response for the
+// PlayersService.List method
 type PlayerListResponse struct {
 	TotalCount int `json:"total_count"`
 	Offset     int `json:"offset"`
@@ -69,18 +74,21 @@ type PlayerListResponse struct {
 	Players    []Player
 }
 
-// Response from the Create method
+// PlayerCreateResponse wraps the standard http.Response for the
+// PlayersService.Create method
 type PlayerCreateResponse struct {
 	Success bool   `json:"success"`
 	ID      string `json:"id"`
 }
 
-// Response from the Update method
+// PlayerUpdateResponse wraps the standard http.Response for the
+// PlayersService.Update method
 type PlayerUpdateResponse struct {
 	Success bool `json:"success"`
 }
 
-// Options passed to the OnSession method
+// PlayerOnSessionOptions specifies the parameters to the
+// PlayersService.OnSession method
 type PlayerOnSessionOptions struct {
 	Identifier  string            `json:"identifier,omitempty"`
 	Language    string            `json:"language,omitempty"`
@@ -92,50 +100,61 @@ type PlayerOnSessionOptions struct {
 	Tags        map[string]string `json:"tags,omitempty"`
 }
 
-// Response from the OnSession method
+// PlayerOnSessionResponse wraps the standard http.Response for the
+// PlayersService.OnSession method
 type PlayerOnSessionResponse struct {
 	Success bool `json:"success"`
 }
 
-// Structure used in options for the OnPurchase method
+// Purchase represents a purchase in the options of the
+// PlayersService.OnPurchase method
 type Purchase struct {
 	SKU    string  `json:"sku"`
 	Amount float32 `json:"amount"`
 	ISO    string  `json:"iso"`
 }
 
-// Options passed to the OnPurchase method
+// PlayerOnPurchaseOptions specifies the parameters to the
+// PlayersService.OnPurchase method
 type PlayerOnPurchaseOptions struct {
 	Purchases []Purchase `json:"purchases"`
 	Existing  bool       `json:"existing,omitempty"`
 }
 
-// Response from the OnPurchase method
+// PlayerOnPurchaseResponse wraps the standard http.Response for the
+// PlayersService.OnPurchase method
 type PlayerOnPurchaseResponse struct {
 	Success bool `json:"success"`
 }
 
-// Options passed to the OnFocus method
+// PlayerOnFocusOptions specifies the parameters to the
+// PlayersService.OnFocus method
 type PlayerOnFocusOptions struct {
 	State      string `json:"state"`
 	ActiveTime int    `json:"active_time"`
 }
 
-// Response from the OnFocus method
+// PlayerOnFocusResponse wraps the standard http.Response for the
+// PlayersService.OnFocus method
 type PlayerOnFocusResponse struct {
 	Success bool `json:"success"`
 }
 
-// Options passed to the CSVExport method
+// PlayerCSVExportOptions specifies the parameters to the
+// PlayersService.CSVExport method
 type PlayerCSVExportOptions struct {
 	AppID string `json:"app_id"`
 }
 
-// Response from the CSVExport method
+// PlayerCSVExportResponse wraps the standard http.Response for the
+// PlayersService.CSVExport method
 type PlayerCSVExportResponse struct {
 	CSVFileURL string `json:"csv_file_url"`
 }
 
+// List the players.
+//
+// OneSignal API docs: https://documentation.onesignal.com/docs/players-view-devices
 func (s *PlayersService) List(opt *PlayerListOptions) (*PlayerListResponse, *http.Response, error) {
 	// build the URL with the query string
 	u, err := url.Parse("/players")
@@ -163,6 +182,9 @@ func (s *PlayersService) List(opt *PlayerListOptions) (*PlayerListResponse, *htt
 	return plResp, resp, err
 }
 
+// Get a single player.
+//
+// OneSignal API docs: https://documentation.onesignal.com/docs/playersid
 func (s *PlayersService) Get(playerID string) (*Player, *http.Response, error) {
 	// build the URL
 	path := fmt.Sprintf("/players/%s", playerID)
@@ -187,6 +209,10 @@ func (s *PlayersService) Get(playerID string) (*Player, *http.Response, error) {
 	return plResp, resp, err
 }
 
+// Create a player.
+//
+// OneSignal API docs:
+// https://documentation.onesignal.com/docs/players-add-a-device
 func (s *PlayersService) Create(player *PlayerRequest) (*PlayerCreateResponse, *http.Response, error) {
 	// build the URL
 	u, err := url.Parse("/players")
@@ -209,6 +235,10 @@ func (s *PlayersService) Create(player *PlayerRequest) (*PlayerCreateResponse, *
 	return plResp, resp, err
 }
 
+// Create a new session for a player.
+//
+// OneSignal API docs:
+// https://documentation.onesignal.com/docs/playersidon_session
 func (s *PlayersService) OnSession(playerID string, opt *PlayerOnSessionOptions) (*PlayerOnSessionResponse, *http.Response, error) {
 	// build the URL
 	path := fmt.Sprintf("/players/%s/on_session", playerID)
@@ -232,6 +262,9 @@ func (s *PlayersService) OnSession(playerID string, opt *PlayerOnSessionOptions)
 	return plResp, resp, err
 }
 
+// Create a new purchase for a player.
+//
+// OneSignal API docs: https://documentation.onesignal.com/docs/on_purchase
 func (s *PlayersService) OnPurchase(playerID string, opt *PlayerOnPurchaseOptions) (*PlayerOnPurchaseResponse, *http.Response, error) {
 	// build the URL
 	path := fmt.Sprintf("/players/%s/on_purchase", playerID)
@@ -255,6 +288,10 @@ func (s *PlayersService) OnPurchase(playerID string, opt *PlayerOnPurchaseOption
 	return plResp, resp, err
 }
 
+// Increment the total session length for a player.
+//
+// OneSignal API docs:
+// https://documentation.onesignal.com/docs/playersidon_focus
 func (s *PlayersService) OnFocus(playerID string, opt *PlayerOnFocusOptions) (*PlayerOnFocusResponse, *http.Response, error) {
 	// build the URL
 	path := fmt.Sprintf("/players/%s/on_focus", playerID)
@@ -278,6 +315,10 @@ func (s *PlayersService) OnFocus(playerID string, opt *PlayerOnFocusOptions) (*P
 	return plResp, resp, err
 }
 
+// Generate a link to download a CSV list of all the players.
+//
+// OneSignal API docs:
+// https://documentation.onesignal.com/docs/players_csv_export
 func (s *PlayersService) CSVExport(opt *PlayerCSVExportOptions) (*PlayerCSVExportResponse, *http.Response, error) {
 	// build the URL with the query string
 	u, err := url.Parse("/players/csv_export")
@@ -303,6 +344,9 @@ func (s *PlayersService) CSVExport(opt *PlayerCSVExportOptions) (*PlayerCSVExpor
 	return plResp, resp, err
 }
 
+// Update a player.
+//
+// OneSignal API docs: https://documentation.onesignal.com/docs/playersid-1
 func (s *PlayersService) Update(playerID string, player *PlayerRequest) (*PlayerUpdateResponse, *http.Response, error) {
 	// build the URL
 	path := fmt.Sprintf("/players/%s", playerID)
