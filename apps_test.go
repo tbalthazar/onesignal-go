@@ -164,17 +164,13 @@ func sampleAppRequest() *AppRequest {
 		ChromeWebDefaultNotificationIcon: "http://yoursite.com/chrome_notification_icon",
 		ChromeWebSubDomain:               "your_site_name",
 		APNSEnv:                          "sandbox",
-		APNSCertificates:                 "Your apns certificate",
-		SafariAPNSCertificate:            "Your Safari APNS certificate",
 		SafariSiteOrigin:                 "The homename for your website for Safari Push, including http or https",
-		SafariPushID:                     "The certificate bundle ID for Safari Web Push",
 		SafariIcon1616:                   "http://onesignal.com/safari_packages/92911750-242d-4260-9e00-9d9034f139ce/16x16.png",
 		SafariIcon3232:                   "http://onesignal.com/safari_packages/92911750-242d-4260-9e00-9d9034f139ce/16x16@2.png",
 		SafariIcon6464:                   "http://onesignal.com/safari_packages/92911750-242d-4260-9e00-9d9034f139ce/32x32@2x.png",
 		SafariIcon128128:                 "http://onesignal.com/safari_packages/92911750-242d-4260-9e00-9d9034f139ce/128x128.png",
 		SafariIcon256256:                 "http://onesignal.com/safari_packages/92911750-242d-4260-9e00-9d9034f139ce/128x128@2x.png",
 		SiteName:                         "The URL to your website for Web Push",
-		BasicAuthKey:                     "NGEwMGZmMjItY2NkNy0xMWUzLTk5ZDUtMDAwYzI5NDBlNjJj",
 	}
 }
 

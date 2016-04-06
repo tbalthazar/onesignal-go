@@ -6,10 +6,13 @@ import (
 	"time"
 )
 
+// AppsService handles communication with the app related
+// methods of the OneSignal API.
 type AppsService struct {
 	client *Client
 }
 
+// App represents a OneSignal app.
 type App struct {
 	ID                               string    `json:"id"`
 	Name                             string    `json:"name"`
@@ -37,28 +40,33 @@ type App struct {
 	BasicAuthKey                     string    `json:"basic_auth_key"`
 }
 
+// AppRequest represents a request to create/update an app.
 type AppRequest struct {
 	Name                             string `json:"name,omitempty"`
 	GCMKey                           string `json:"gcm_key,omitempty"`
 	ChromeKey                        string `json:"chrome_key,omitempty"`
+	ChromeWebKey                     string `json:"chrome_web_key,omitempty"`
 	ChromeWebOrigin                  string `json:"chrome_web_origin,omitempty"`
 	ChromeWebGCMSenderID             string `json:"chrome_web_gcm_sender_id,omitempty"`
 	ChromeWebDefaultNotificationIcon string `json:"chrome_web_default_notification_icon,omitempty"`
 	ChromeWebSubDomain               string `json:"chrome_web_sub_domain,omitempty"`
 	APNSEnv                          string `json:"apns_env,omitempty"`
-	APNSCertificates                 string `json:"apns_certificates,omitempty"`
-	SafariAPNSCertificate            string `json:"safari_apns_cetificate,omitempty"`
+	APNSP12                          string `json:"apns_p12,omitempty"`
+	APNSP12Password                  string `json:"apns_p12_password,omitempty"`
+	SafariAPNSP12                    string `json:"safari_apns_p12,omitempty"`
+	SafariAPNSP12Password            string `json:"safari_apns_p12_password,omitempty"`
 	SafariSiteOrigin                 string `json:"safari_site_origin,omitempty"`
-	SafariPushID                     string `json:"safari_push_id,omitempty"`
 	SafariIcon1616                   string `json:"safari_icon_16_16,omitempty"`
 	SafariIcon3232                   string `json:"safari_icon_32_32,omitempty"`
 	SafariIcon6464                   string `json:"safari_icon_64_64,omitempty"`
 	SafariIcon128128                 string `json:"safari_icon_128_128,omitempty"`
 	SafariIcon256256                 string `json:"safari_icon_256_256,omitempty"`
 	SiteName                         string `json:"site_name,omitempty"`
-	BasicAuthKey                     string `json:"basic_auth_key,omitempty"`
 }
 
+// List the apps.
+//
+// OneSignal API docs: https://documentation.onesignal.com/docs/apps-view-apps
 func (s *AppsService) List() ([]App, *http.Response, error) {
 	// build the URL
 	u, err := url.Parse("/apps")
@@ -81,6 +89,9 @@ func (s *AppsService) List() ([]App, *http.Response, error) {
 	return *apps, resp, err
 }
 
+// Get a single app.
+//
+// OneSignal API docs: https://documentation.onesignal.com/docs/appsid
 func (s *AppsService) Get(appID string) (*App, *http.Response, error) {
 	// build the URL
 	u, err := url.Parse("/apps/" + appID)
@@ -103,6 +114,9 @@ func (s *AppsService) Get(appID string) (*App, *http.Response, error) {
 	return app, resp, err
 }
 
+// Create an app.
+//
+// OneSignal API docs: https://documentation.onesignal.com/docs/apps-create-an-app
 func (s *AppsService) Create(opt *AppRequest) (*App, *http.Response, error) {
 	// build the URL
 	u, err := url.Parse("/apps")
@@ -125,6 +139,9 @@ func (s *AppsService) Create(opt *AppRequest) (*App, *http.Response, error) {
 	return app, resp, err
 }
 
+// Update an app.
+//
+// OneSignal API docs: https://documentation.onesignal.com/docs/appsid-update-an-app
 func (s *AppsService) Update(appID string, opt *AppRequest) (*App, *http.Response, error) {
 	// build the URL
 	u, err := url.Parse("/apps/" + appID)
