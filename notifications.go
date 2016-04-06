@@ -6,10 +6,13 @@ import (
 	"strconv"
 )
 
+// NotificationsService handles communication with the notification related
+// methods of the OneSignal API.
 type NotificationsService struct {
 	client *Client
 }
 
+// Notification  represents a OneSignal notification.
 type Notification struct {
 	ID         string            `json:"id"`
 	Successful int               `json:"successful"`
@@ -25,6 +28,7 @@ type Notification struct {
 	Contents   map[string]string `json:"contents"`
 }
 
+// NotificationRequest represents a request to create a notification.
 type NotificationRequest struct {
 	AppID                  string            `json:"app_id"`
 	Contents               map[string]string `json:"contents,omitempty"`
@@ -85,20 +89,24 @@ type NotificationRequest struct {
 	ADMGroupMessage        interface{}       `json:"adm_group_message,omitempty"`
 }
 
+// NotificationCreateResponse wraps the standard http.Response for the
+// NotificationsService.Create method
 type NotificationCreateResponse struct {
 	ID         string      `json:"id"`
 	Recipients int         `json:"recipients"`
 	Errors     interface{} `json:"errors"`
 }
 
-// Options passed to the List method
+// NotificationListOptions specifies the parameters to the
+// NotificationsService.List method
 type NotificationListOptions struct {
 	AppID  string `json:"app_id"`
 	Limit  int    `json:"limit"`
 	Offset int    `json:"offset"`
 }
 
-// Response from the List method
+// NotificationListResponse wraps the standard http.Response for the
+// NotificationsService.List method
 type NotificationListResponse struct {
 	TotalCount    int `json:"total_count"`
 	Offset        int `json:"offset"`
@@ -106,32 +114,41 @@ type NotificationListResponse struct {
 	Notifications []Notification
 }
 
-// Options passed to the Get method
+// NotificationUpdateOptions specifies the parameters to the
+// NotificationsService.Get method
 type NotificationGetOptions struct {
 	AppID string `json:"app_id"`
 }
 
-// Options passed to the Update method
+// NotificationUpdateOptions specifies the parameters to the
+// NotificationsService.Update method
 type NotificationUpdateOptions struct {
 	AppID  string `json:"app_id"`
 	Opened bool   `json:"opened"`
 }
 
-// Response from the Update method
+// NotificationUpdateResponse wraps the standard http.Response for the
+// NotificationsService.Update method
 type NotificationUpdateResponse struct {
 	Success bool `json:"success"`
 }
 
-// Options passed to the Delete method
+// NotificationDeleteOptions specifies the parameters to the
+// NotificationsService.Delete method
 type NotificationDeleteOptions struct {
 	AppID string `json:"app_id"`
 }
 
-// Response from the Delete method
+// NotificationDeleteResponse wraps the standard http.Response for the
+// NotificationsService.Delete method
 type NotificationDeleteResponse struct {
 	Success bool `json:"success"`
 }
 
+// List the notifications.
+//
+// OneSignal API docs:
+// https://documentation.onesignal.com/docs/notifications-view-notifications
 func (s *NotificationsService) List(opt *NotificationListOptions) (*NotificationListResponse, *http.Response, error) {
 	// build the URL with the query string
 	u, err := url.Parse("/notifications")
@@ -159,6 +176,10 @@ func (s *NotificationsService) List(opt *NotificationListOptions) (*Notification
 	return notifResp, resp, err
 }
 
+// Get a single notification.
+//
+// OneSignal API docs:
+// https://documentation.onesignal.com/docs/notificationsid-view-notification
 func (s *NotificationsService) Get(notificationID string, opt *NotificationGetOptions) (*Notification, *http.Response, error) {
 	// build the URL with the query string
 	u, err := url.Parse("/notifications/" + notificationID)
@@ -184,6 +205,10 @@ func (s *NotificationsService) Get(notificationID string, opt *NotificationGetOp
 	return notif, resp, err
 }
 
+// Create a notification.
+//
+// OneSignal API docs:
+// https://documentation.onesignal.com/docs/notifications-create-notification
 func (s *NotificationsService) Create(opt *NotificationRequest) (*NotificationCreateResponse, *http.Response, error) {
 	// build the URL
 	u, err := url.Parse("/notifications")
@@ -206,6 +231,10 @@ func (s *NotificationsService) Create(opt *NotificationRequest) (*NotificationCr
 	return createRes, resp, err
 }
 
+// Update a notification.
+//
+// OneSignal API docs:
+// https://documentation.onesignal.com/docs/notificationsid-track-open
 func (s *NotificationsService) Update(notificationID string, opt *NotificationUpdateOptions) (*NotificationUpdateResponse, *http.Response, error) {
 	// build the URL
 	u, err := url.Parse("/notifications/" + notificationID)
@@ -228,6 +257,10 @@ func (s *NotificationsService) Update(notificationID string, opt *NotificationUp
 	return updateRes, resp, err
 }
 
+// Delete a notification.
+//
+// OneSignal API docs:
+// https://documentation.onesignal.com/docs/notificationsid-cancel-notification
 func (s *NotificationsService) Delete(notificationID string, opt *NotificationDeleteOptions) (*NotificationDeleteResponse, *http.Response, error) {
 	// build the URL
 	u, err := url.Parse("/notifications/" + notificationID)
