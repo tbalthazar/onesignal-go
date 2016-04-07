@@ -1,3 +1,4 @@
+// Package onesignal provides the binding for OneSignal API.
 package onesignal
 
 import (
@@ -14,6 +15,7 @@ const (
 	defaultBaseURL = "https://onesignal.com/api/v1/"
 )
 
+// AuthKeyType specifies the token used to authentify the requests
 type AuthKeyType uint
 
 const (
@@ -21,6 +23,7 @@ const (
 	USER
 )
 
+// A Client manages communication with the OneSignal API.
 type Client struct {
 	BaseURL *url.URL
 	AppKey  string
@@ -32,6 +35,7 @@ type Client struct {
 	Notifications *NotificationsService
 }
 
+// ErrorResponse reports one or more errors caused by an API request.
 type ErrorResponse struct {
 	Messages []string `json:"errors"`
 }
@@ -64,7 +68,10 @@ func NewClient(httpClient *http.Client) *Client {
 	return c
 }
 
-// NewRequest creates an API request.
+// NewRequest creates an API request. path is a relative URL, like "/apps". The
+// value pointed to by body is JSON encoded and included as the request body.
+// The AuthKeyType will determine which authorization token (APP or USER) is
+// used for the request.
 func (c *Client) NewRequest(method, path string, body interface{}, authKeyType AuthKeyType) (*http.Request, error) {
 	// build the URL
 	u, err := url.Parse(c.BaseURL.String() + path)
@@ -105,6 +112,9 @@ func (c *Client) NewRequest(method, path string, body interface{}, authKeyType A
 	return req, nil
 }
 
+// Do sends an API request and returns the API response. The API response is
+// JSON decoded and stored in the value pointed to by v, or returned as an
+// error if an API error has occurred.
 func (c *Client) Do(r *http.Request, v interface{}) (*http.Response, error) {
 	// send the request
 	resp, err := c.Client.Do(r)
@@ -131,6 +141,11 @@ func (c *Client) Do(r *http.Request, v interface{}) (*http.Response, error) {
 	return resp, nil
 }
 
+// CheckResponse checks the API response for errors, and returns them if
+// present.  A response is considered an error if it has a status code outside
+// the 200 range.  API error responses are expected to have either no response
+// body, or a JSON response body that maps to ErrorResponse.  Any other
+// response body will be silently ignored.
 func CheckResponse(r *http.Response) error {
 	switch r.StatusCode {
 	case http.StatusOK:
