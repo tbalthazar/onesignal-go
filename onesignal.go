@@ -35,6 +35,12 @@ type Client struct {
 	Notifications *NotificationsService
 }
 
+// SuccessResponse  wraps the standard http.Response for several API methods
+// that just return a Success flag.
+type SuccessResponse struct {
+	Success bool `json:"success"`
+}
+
 // ErrorResponse reports one or more errors caused by an API request.
 type ErrorResponse struct {
 	Messages []string `json:"errors"`

@@ -336,7 +336,7 @@ func TestPlayersService_OnSession(t *testing.T) {
 	})
 
 	onSessionRes, _, err := client.Players.OnSession("id123", opt)
-	want := &PlayerOnSessionResponse{
+	want := &SuccessResponse{
 		Success: true,
 	}
 
@@ -375,7 +375,7 @@ func TestPlayersService_OnPurchase(t *testing.T) {
 	})
 
 	onPurchaseRes, _, err := client.Players.OnPurchase("id123", opt)
-	want := &PlayerOnPurchaseResponse{
+	want := &SuccessResponse{
 		Success: true,
 	}
 
@@ -414,7 +414,7 @@ func TestPlayersService_OnFocus(t *testing.T) {
 	})
 
 	onFocusRes, _, err := client.Players.OnFocus("id123", opt)
-	want := &PlayerOnFocusResponse{
+	want := &SuccessResponse{
 		Success: true,
 	}
 
@@ -504,7 +504,7 @@ func TestPlayersService_Update(t *testing.T) {
 	})
 
 	updateRes, _, _ := client.Players.Update("fake-id", playerRequest)
-	want := &PlayerUpdateResponse{
+	want := &SuccessResponse{
 		Success: true,
 	}
 	if !reflect.DeepEqual(want, updateRes) {

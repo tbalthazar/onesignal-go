@@ -127,22 +127,10 @@ type NotificationUpdateOptions struct {
 	Opened bool   `json:"opened"`
 }
 
-// NotificationUpdateResponse wraps the standard http.Response for the
-// NotificationsService.Update method
-type NotificationUpdateResponse struct {
-	Success bool `json:"success"`
-}
-
 // NotificationDeleteOptions specifies the parameters to the
 // NotificationsService.Delete method
 type NotificationDeleteOptions struct {
 	AppID string `json:"app_id"`
-}
-
-// NotificationDeleteResponse wraps the standard http.Response for the
-// NotificationsService.Delete method
-type NotificationDeleteResponse struct {
-	Success bool `json:"success"`
 }
 
 // List the notifications.
@@ -235,7 +223,7 @@ func (s *NotificationsService) Create(opt *NotificationRequest) (*NotificationCr
 //
 // OneSignal API docs:
 // https://documentation.onesignal.com/docs/notificationsid-track-open
-func (s *NotificationsService) Update(notificationID string, opt *NotificationUpdateOptions) (*NotificationUpdateResponse, *http.Response, error) {
+func (s *NotificationsService) Update(notificationID string, opt *NotificationUpdateOptions) (*SuccessResponse, *http.Response, error) {
 	// build the URL
 	u, err := url.Parse("/notifications/" + notificationID)
 	if err != nil {
@@ -248,7 +236,7 @@ func (s *NotificationsService) Update(notificationID string, opt *NotificationUp
 		return nil, nil, err
 	}
 
-	updateRes := &NotificationUpdateResponse{}
+	updateRes := &SuccessResponse{}
 	resp, err := s.client.Do(req, updateRes)
 	if err != nil {
 		return nil, resp, err
@@ -261,7 +249,7 @@ func (s *NotificationsService) Update(notificationID string, opt *NotificationUp
 //
 // OneSignal API docs:
 // https://documentation.onesignal.com/docs/notificationsid-cancel-notification
-func (s *NotificationsService) Delete(notificationID string, opt *NotificationDeleteOptions) (*NotificationDeleteResponse, *http.Response, error) {
+func (s *NotificationsService) Delete(notificationID string, opt *NotificationDeleteOptions) (*SuccessResponse, *http.Response, error) {
 	// build the URL
 	u, err := url.Parse("/notifications/" + notificationID)
 	if err != nil {
@@ -274,7 +262,7 @@ func (s *NotificationsService) Delete(notificationID string, opt *NotificationDe
 		return nil, nil, err
 	}
 
-	deleteRes := &NotificationDeleteResponse{}
+	deleteRes := &SuccessResponse{}
 	resp, err := s.client.Do(req, deleteRes)
 	if err != nil {
 		return nil, resp, err

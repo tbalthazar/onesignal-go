@@ -422,7 +422,7 @@ func TestNotificationsService_Update(t *testing.T) {
 		}`)
 	})
 
-	want := &NotificationUpdateResponse{
+	want := &SuccessResponse{
 		Success: true,
 	}
 	updateRes, _, err := client.Notifications.Update(notifID, opt)
@@ -463,7 +463,7 @@ func TestNotificationsService_Delete(t *testing.T) {
 		}`)
 	})
 
-	want := &NotificationDeleteResponse{
+	want := &SuccessResponse{
 		Success: true,
 	}
 	deleteRes, _, err := client.Notifications.Delete(notifID, opt)
