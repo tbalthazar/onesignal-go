@@ -2,6 +2,8 @@
 
 This library provides a simple SDK to access the [OneSignal API](https://documentation.onesignal.com/docs/server-api-overview).
 
+Also check my [onesignal-ruby](https://github.com/tbalthazar/onesignal-ruby) gem.
+
 ## Installation
 
 ```
