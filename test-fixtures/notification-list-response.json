@@ -1,0 +1,51 @@
+{
+		"total_count":2,
+	  "offset":0,
+	  "limit":10,
+	  "notifications":
+	  [
+	    {
+	     "id":"481a2734-6b7d-11e4-a6ea-4b53294fa671",
+	     "successful":15,
+	     "failed":1,
+	     "converted":3,
+	     "remaining":0,
+	     "queued_at":1415914655,
+	     "send_after":1415914655,
+	     "canceled": false,
+	     "url": "https://yourWebsiteToOpen.com",
+	     "data":null,
+	     "headings":{
+	       "en":"English and default langauge heading",
+	       "es":"Spanish language heading"
+	     },     
+	     "contents":{
+	       "en":"English and default content",
+	       "es":"Hola"
+	     }
+	    },
+	    {
+	     "id":"b6b326a8-40aa-13e5-b91b-bf8bc3fa26f7",
+	     "successful":5,
+	     "failed":2,
+	     "converted":0,
+	     "remaining":0,
+	     "queued_at":1415915123,
+	     "send_after":1415915123,
+	     "canceled": false,
+			 "url": null,
+	     "data":{
+	       "foo":"bar",
+	       "your":"custom metadata"
+	     },
+	     "headings":{
+	       "en":"English and default langauge heading",
+	       "es":"Spanish language heading"
+	     },
+	     "contents":{
+	       "en":"English and default content",
+	       "es":"Hola"
+	     }
+	    }
+	  ]
+}

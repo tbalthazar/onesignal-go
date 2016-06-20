@@ -7,144 +7,58 @@ import (
 	"reflect"
 	"strconv"
 	"testing"
+
+	"github.com/tbalthazar/onesignal-go/testhelper"
 )
 
-func sampleNotificationListResponse() string {
-	return `{
-		"total_count":2,
-	  "offset":0,
-	  "limit":10,
-	  "notifications":
-	  [
-	    {
-	     "id":"481a2734-6b7d-11e4-a6ea-4b53294fa671",
-	     "successful":15,
-	     "failed":1,
-	     "converted":3,
-	     "remaining":0,
-	     "queued_at":1415914655,
-	     "send_after":1415914655,
-	     "canceled": false,
-	     "url": "https://yourWebsiteToOpen.com",
-	     "data":null,
-	     "headings":{
-	       "en":"English and default langauge heading",
-	       "es":"Spanish language heading"
-	     },     
-	     "contents":{
-	       "en":"English and default content",
-	       "es":"Hola"
-	     }
-	    },
-	    {
-	     "id":"b6b326a8-40aa-13e5-b91b-bf8bc3fa26f7",
-	     "successful":5,
-	     "failed":2,
-	     "converted":0,
-	     "remaining":0,
-	     "queued_at":1415915123,
-	     "send_after":1415915123,
-	     "canceled": false,
-			 "url": null,
-	     "data":{
-	       "foo":"bar",
-	       "your":"custom metadata"
-	     },
-	     "headings":{
-	       "en":"English and default langauge heading",
-	       "es":"Spanish language heading"
-	     },
-	     "contents":{
-	       "en":"English and default content",
-	       "es":"Hola"
-	     }
-	    }
-	  ]
-	}`
+var sampleNotification1 = &Notification{
+	ID:         "481a2734-6b7d-11e4-a6ea-4b53294fa671",
+	Successful: 15,
+	Failed:     1,
+	Converted:  3,
+	Remaining:  0,
+	QueuedAt:   1415914655,
+	SendAfter:  1415914655,
+	Canceled:   false,
+	URL:        "https://yourWebsiteToOpen.com",
+	Headings: map[string]string{
+		"en": "English and default langauge heading",
+		"es": "Spanish language heading",
+	},
+	Contents: map[string]string{
+		"en": "English and default content",
+		"es": "Hola",
+	},
 }
 
-func sampleNotificationGetResponse() string {
-	return `{
-	     "id":"b6b326a8-40aa-13e5-b91b-bf8bc3fa26f7",
-	     "successful":5,
-	     "failed":2,
-	     "converted":0,
-	     "remaining":0,
-	     "queued_at":1415915123,
-	     "send_after":1415915123,
-	     "canceled": false,
-			 "url": null,
-	     "data":{
-	       "foo":"bar",
-	       "your":"custom metadata"
-	     },
-	     "headings":{
-	       "en":"English and default langauge heading",
-	       "es":"Spanish language heading"
-	     },
-	     "contents":{
-	       "en":"English and default content",
-	       "es":"Hola"
-	     }
-	    }`
-}
-
-func sampleNotification1() *Notification {
-	return &Notification{
-		ID:         "481a2734-6b7d-11e4-a6ea-4b53294fa671",
-		Successful: 15,
-		Failed:     1,
-		Converted:  3,
-		Remaining:  0,
-		QueuedAt:   1415914655,
-		SendAfter:  1415914655,
-		Canceled:   false,
-		URL:        "https://yourWebsiteToOpen.com",
-		Headings: map[string]string{
-			"en": "English and default langauge heading",
-			"es": "Spanish language heading",
-		},
-		Contents: map[string]string{
-			"en": "English and default content",
-			"es": "Hola",
-		},
-	}
-}
-
-func sampleNotification2() *Notification {
-	var data interface{}
-	data = map[string]interface{}{
+var sampleNotification2 = &Notification{
+	ID:         "b6b326a8-40aa-13e5-b91b-bf8bc3fa26f7",
+	Successful: 5,
+	Failed:     2,
+	Converted:  0,
+	Remaining:  0,
+	QueuedAt:   1415915123,
+	SendAfter:  1415915123,
+	Canceled:   false,
+	Data: map[string]interface{}{
 		"foo":  "bar",
 		"your": "custom metadata",
-	}
-	return &Notification{
-		ID:         "b6b326a8-40aa-13e5-b91b-bf8bc3fa26f7",
-		Successful: 5,
-		Failed:     2,
-		Converted:  0,
-		Remaining:  0,
-		QueuedAt:   1415915123,
-		SendAfter:  1415915123,
-		Canceled:   false,
-		Data:       data,
-		Headings: map[string]string{
-			"en": "English and default langauge heading",
-			"es": "Spanish language heading",
-		},
-		Contents: map[string]string{
-			"en": "English and default content",
-			"es": "Hola",
-		},
-	}
+	},
+	Headings: map[string]string{
+		"en": "English and default langauge heading",
+		"es": "Spanish language heading",
+	},
+	Contents: map[string]string{
+		"en": "English and default content",
+		"es": "Hola",
+	},
 }
 
-func sampleNotificationRequest() *NotificationRequest {
-	return &NotificationRequest{
-		AppID:            "id123",
-		Contents:         map[string]string{"en": "English message"},
-		IsIOS:            true,
-		IncludePlayerIDs: []string{"playerid123"},
-	}
+var sampleNotificationRequest = &NotificationRequest{
+	AppID:            "id123",
+	Contents:         map[string]string{"en": "English message"},
+	IsIOS:            true,
+	IncludePlayerIDs: []string{"playerid123"},
 }
 
 func TestNotificationsService_List(t *testing.T) {
@@ -180,7 +94,7 @@ func TestNotificationsService_List(t *testing.T) {
 			t.Errorf("URL: got %v, want %v", got, want)
 		}
 
-		fmt.Fprint(w, sampleNotificationListResponse())
+		fmt.Fprint(w, testhelper.LoadFixture(t, "notification-list-response.json"))
 	})
 
 	listRes, _, err := client.Notifications.List(opt)
@@ -188,8 +102,8 @@ func TestNotificationsService_List(t *testing.T) {
 		t.Errorf("List returned an error: %v", err)
 	}
 
-	notification1 := *sampleNotification1()
-	notification2 := *sampleNotification2()
+	notification1 := *sampleNotification1
+	notification2 := *sampleNotification2
 	want := &NotificationListResponse{
 		TotalCount:    2,
 		Offset:        0,
@@ -215,7 +129,7 @@ func TestNotificationsService_Get(t *testing.T) {
 	opt := &NotificationGetOptions{
 		AppID: "fake-app-id",
 	}
-	notification := sampleNotification2()
+	notification := sampleNotification2
 
 	mux.HandleFunc("/notifications/"+notification.ID, func(w http.ResponseWriter, r *http.Request) {
 		requestSent = true
@@ -235,7 +149,7 @@ func TestNotificationsService_Get(t *testing.T) {
 			t.Errorf("URL: got %v, want %v", got, want)
 		}
 
-		fmt.Fprint(w, sampleNotificationGetResponse())
+		fmt.Fprint(w, testhelper.LoadFixture(t, "notification-get-response.json"))
 	})
 
 	getRes, _, err := client.Notifications.Get(notification.ID, opt)
@@ -258,7 +172,7 @@ func TestNotificationsService_Create(t *testing.T) {
 
 	requestSent := false
 
-	notificationRequest := sampleNotificationRequest()
+	notificationRequest := sampleNotificationRequest
 
 	mux.HandleFunc("/notifications", func(w http.ResponseWriter, r *http.Request) {
 		requestSent = true
@@ -296,7 +210,7 @@ func TestNotificationsService_Create_returnsError(t *testing.T) {
 	setup()
 	defer teardown()
 
-	notificationRequest := sampleNotificationRequest()
+	notificationRequest := sampleNotificationRequest
 
 	mux.HandleFunc("/notifications", func(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusBadRequest)
@@ -328,7 +242,7 @@ func TestNotificationsService_Create_invalidPlayerIds(t *testing.T) {
 	setup()
 	defer teardown()
 
-	notificationRequest := sampleNotificationRequest()
+	notificationRequest := sampleNotificationRequest
 
 	mux.HandleFunc("/notifications", func(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusOK)
@@ -366,7 +280,7 @@ func TestNotificationsService_Create_noSubscribedPlayers(t *testing.T) {
 	setup()
 	defer teardown()
 
-	notificationRequest := sampleNotificationRequest()
+	notificationRequest := sampleNotificationRequest
 
 	mux.HandleFunc("/notifications", func(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusOK)

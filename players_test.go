@@ -7,150 +7,89 @@ import (
 	"reflect"
 	"strconv"
 	"testing"
+
+	"github.com/tbalthazar/onesignal-go/testhelper"
 )
 
-func samplePlayerRequest() *PlayerRequest {
-	return &PlayerRequest{
-		Identifier:   "fake-identifier",
-		Language:     "fake-language",
-		Timezone:     -28800,
-		GameVersion:  "1.0",
-		DeviceOS:     "iOS",
-		DeviceModel:  "iPhone5,2",
-		AdID:         "fake-ad-id",
-		SDK:          "fake-sdk",
-		SessionCount: 1,
-		Tags: map[string]string{
-			"a":   "1",
-			"foo": "bar",
+var samplePlayerRequest = &PlayerRequest{
+	Identifier:   "fake-identifier",
+	Language:     "fake-language",
+	Timezone:     -28800,
+	GameVersion:  "1.0",
+	DeviceOS:     "iOS",
+	DeviceModel:  "iPhone5,2",
+	AdID:         "fake-ad-id",
+	SDK:          "fake-sdk",
+	SessionCount: 1,
+	Tags: map[string]string{
+		"a":   "1",
+		"foo": "bar",
+	},
+	AmountSpent:       0,
+	CreatedAt:         1395096859,
+	Playtime:          12,
+	BadgeCount:        1,
+	LastActive:        1395096859,
+	TestType:          1,
+	NotificationTypes: "2",
+}
+
+var samplePlayer = &Player{
+	ID:           "id123",
+	Playtime:     0,
+	SDK:          "fake-sdk",
+	Identifier:   "ce777617da7f548fe7a9ab6febb56cf39fba6d382000c0395666288d961ee566",
+	SessionCount: 1,
+	Language:     "en",
+	Timezone:     -28800,
+	GameVersion:  "1.0",
+	DeviceOS:     "7.0.4",
+	DeviceType:   0,
+	DeviceModel:  "iPhone",
+	Tags: map[string]string{
+		"a":   "1",
+		"foo": "bar",
+	},
+	LastActive:        1395096859,
+	AmountSpent:       0.0,
+	CreatedAt:         1395096859,
+	InvalidIdentifier: false,
+	BadgeCount:        0,
+}
+
+var samplePlayerOnSessionOptions = &PlayerOnSessionOptions{
+	Identifier:  "ce777617da7f548fe7a9ab6febb56cf39fba6d382000c0395666288d961ee566",
+	Language:    "en",
+	Timezone:    -28800,
+	GameVersion: "1.0",
+	DeviceOS:    "7.0.4",
+	AdID:        "fake-ad-id",
+	SDK:         "fake-sdk",
+	Tags: map[string]string{
+		"a":   "1",
+		"foo": "bar",
+	},
+}
+
+var samplePlayerOnPurchaseOptions = &PlayerOnPurchaseOptions{
+	Purchases: []Purchase{
+		Purchase{
+			SKU:    "foosku1",
+			Amount: 1.99,
+			ISO:    "BEL",
 		},
-		AmountSpent:       0,
-		CreatedAt:         1395096859,
-		Playtime:          12,
-		BadgeCount:        1,
-		LastActive:        1395096859,
-		TestType:          1,
-		NotificationTypes: "2",
-	}
-}
-
-func samplePlayerListResponse() string {
-	return `{
-		  "total_count":2,
-		  "offset":0,
-		  "limit":10,
-		  "players":
-		  [
-		     {
-					 "id": "id123",
-					 "playtime": 0,
-					 "sdk": "fake-sdk",
-		       "identifier":"ce777617da7f548fe7a9ab6febb56cf39fba6d382000c0395666288d961ee566",
-		       "session_count":1,
-		       "language":"en",
-		       "timezone":-28800,
-		       "game_version":"1.0",
-		       "device_os":"7.0.4",
-		       "device_type":0,
-		       "device_model":"iPhone",
-		       "ad_id":null,
-		       "tags":{"a":"1","foo":"bar"},
-		       "last_active":1395096859,
-		       "amount_spent":0.0,
-		       "created_at":1395096859,
-		       "invalid_identifier":false,
-		       "badge_count": 0
-		     }
-		  ]
-	}`
-}
-
-func samplePlayerResponse() string {
-	return `{
-		"id": "id123",
-	  "identifier":"ce777617da7f548fe7a9ab6febb56cf39fba6d382000c0395666288d961ee566",
-	  "session_count":1,
-	  "language":"en",
-	  "timezone":-28800,
-	  "game_version":"1.0",
-	  "device_os":"7.0.4",
-	  "device_type":0,
-	  "device_model":"iPhone",
-	  "ad_id":null,
-	  "tags":{"a":"1","foo":"bar"},
-	  "last_active":1395096859,
-		"playtime":0,
-	  "amount_spent":0.0,
-	  "created_at":1395096859,
-	  "invalid_identifier":false,
-	  "badge_count": 0,
-		"sdk": "fake-sdk"
-	}`
-}
-
-func samplePlayer() *Player {
-	return &Player{
-		ID:           "id123",
-		Playtime:     0,
-		SDK:          "fake-sdk",
-		Identifier:   "ce777617da7f548fe7a9ab6febb56cf39fba6d382000c0395666288d961ee566",
-		SessionCount: 1,
-		Language:     "en",
-		Timezone:     -28800,
-		GameVersion:  "1.0",
-		DeviceOS:     "7.0.4",
-		DeviceType:   0,
-		DeviceModel:  "iPhone",
-		Tags: map[string]string{
-			"a":   "1",
-			"foo": "bar",
+		Purchase{
+			SKU:    "foosku2",
+			Amount: 2.99,
+			ISO:    "GER",
 		},
-		LastActive:        1395096859,
-		AmountSpent:       0.0,
-		CreatedAt:         1395096859,
-		InvalidIdentifier: false,
-		BadgeCount:        0,
-	}
+	},
+	Existing: true,
 }
 
-func samplePlayerOnSessionOptions() *PlayerOnSessionOptions {
-	return &PlayerOnSessionOptions{
-		Identifier:  "ce777617da7f548fe7a9ab6febb56cf39fba6d382000c0395666288d961ee566",
-		Language:    "en",
-		Timezone:    -28800,
-		GameVersion: "1.0",
-		DeviceOS:    "7.0.4",
-		AdID:        "fake-ad-id",
-		SDK:         "fake-sdk",
-		Tags: map[string]string{
-			"a":   "1",
-			"foo": "bar",
-		},
-	}
-}
-
-func samplePlayerOnPurchaseOptions() *PlayerOnPurchaseOptions {
-	p1 := Purchase{
-		SKU:    "foosku1",
-		Amount: 1.99,
-		ISO:    "BEL",
-	}
-	p2 := Purchase{
-		SKU:    "foosku2",
-		Amount: 2.99,
-		ISO:    "GER",
-	}
-	return &PlayerOnPurchaseOptions{
-		Purchases: []Purchase{p1, p2},
-		Existing:  true,
-	}
-}
-
-func samplePlayerOnFocusOptions() *PlayerOnFocusOptions {
-	return &PlayerOnFocusOptions{
-		State:      "ping",
-		ActiveTime: 60,
-	}
+var samplePlayerOnFocusOptions = &PlayerOnFocusOptions{
+	State:      "ping",
+	ActiveTime: 60,
 }
 
 func TestPlayersService_List(t *testing.T) {
@@ -186,7 +125,7 @@ func TestPlayersService_List(t *testing.T) {
 			t.Errorf("URL: got %v, want %v", got, want)
 		}
 
-		fmt.Fprint(w, samplePlayerListResponse())
+		fmt.Fprint(w, testhelper.LoadFixture(t, "player-list-response.json"))
 	})
 
 	listRes, _, err := client.Players.List(opt)
@@ -194,7 +133,7 @@ func TestPlayersService_List(t *testing.T) {
 		t.Errorf("List returned an error: %v", err)
 	}
 
-	player := *samplePlayer()
+	player := *samplePlayer
 	want := &PlayerListResponse{
 		TotalCount: 2,
 		Offset:     0,
@@ -259,11 +198,11 @@ func TestPlayersService_Get(t *testing.T) {
 		testMethod(t, r, "GET")
 		testHeader(t, r, "Authorization", "Basic "+client.AppKey)
 
-		fmt.Fprint(w, samplePlayerResponse())
+		fmt.Fprint(w, testhelper.LoadFixture(t, "player-get-response.json"))
 	})
 
 	player, _, err := client.Players.Get("id123")
-	want := samplePlayer()
+	want := samplePlayer
 
 	if err != nil {
 		t.Errorf("Shouldn't have returned an error: %+v", err)
@@ -284,7 +223,7 @@ func TestPlayersService_Create(t *testing.T) {
 	setup()
 	defer teardown()
 
-	playerRequest := samplePlayerRequest()
+	playerRequest := samplePlayerRequest
 
 	mux.HandleFunc("/players", func(w http.ResponseWriter, r *http.Request) {
 		requestSent = true
@@ -320,7 +259,7 @@ func TestPlayersService_OnSession(t *testing.T) {
 	setup()
 	defer teardown()
 
-	opt := samplePlayerOnSessionOptions()
+	opt := samplePlayerOnSessionOptions
 
 	mux.HandleFunc("/players/id123/on_session", func(w http.ResponseWriter, r *http.Request) {
 		requestSent = true
@@ -359,7 +298,7 @@ func TestPlayersService_OnPurchase(t *testing.T) {
 	setup()
 	defer teardown()
 
-	opt := samplePlayerOnPurchaseOptions()
+	opt := samplePlayerOnPurchaseOptions
 
 	mux.HandleFunc("/players/id123/on_purchase", func(w http.ResponseWriter, r *http.Request) {
 		requestSent = true
@@ -398,7 +337,7 @@ func TestPlayersService_OnFocus(t *testing.T) {
 	setup()
 	defer teardown()
 
-	opt := samplePlayerOnFocusOptions()
+	opt := samplePlayerOnFocusOptions
 
 	mux.HandleFunc("/players/id123/on_focus", func(w http.ResponseWriter, r *http.Request) {
 		requestSent = true
@@ -488,7 +427,7 @@ func TestPlayersService_Update(t *testing.T) {
 	setup()
 	defer teardown()
 
-	playerRequest := samplePlayerRequest()
+	playerRequest := samplePlayerRequest
 
 	mux.HandleFunc("/players/fake-id", func(w http.ResponseWriter, r *http.Request) {
 		requestSent = true
