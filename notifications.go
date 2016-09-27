@@ -87,6 +87,7 @@ type NotificationRequest struct {
 	AndroidGroupMessage    interface{}       `json:"android_group_message,omitempty"`
 	ADMGroup               string            `json:"adm_group,omitempty"`
 	ADMGroupMessage        interface{}       `json:"adm_group_message,omitempty"`
+	Filters                interface{}       `json:"filters,omitempty"`
 }
 
 // NotificationCreateResponse wraps the standard http.Response for the
