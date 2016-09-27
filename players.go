@@ -37,8 +37,8 @@ type Player struct {
 
 // PlayerRequest represents a request to create/update a player.
 type PlayerRequest struct {
-	AppID             string            `json:"app_id,omitempty"`
-	DeviceType        int               `json:"device_type,omitempty"`
+	AppID             string            `json:"app_id"`
+	DeviceType        int               `json:"device_type"`
 	Identifier        string            `json:"identifier,omitempty"`
 	Language          string            `json:"language,omitempty"`
 	Timezone          int               `json:"timezone,omitempty"`
