@@ -38,7 +38,7 @@ type Player struct {
 // PlayerRequest represents a request to create/update a player.
 type PlayerRequest struct {
 	AppID             string            `json:"app_id"`
-	DeviceType        int               `json:"device_type"`
+	DeviceType        int               `json:"device_type,omitempty"`
 	Identifier        string            `json:"identifier,omitempty"`
 	Language          string            `json:"language,omitempty"`
 	Timezone          int               `json:"timezone,omitempty"`
@@ -119,7 +119,9 @@ type PlayerOnFocusOptions struct {
 // PlayerCSVExportOptions specifies the parameters to the
 // PlayersService.CSVExport method
 type PlayerCSVExportOptions struct {
-	AppID string `json:"app_id"`
+	AppID           string      `json:"app_id"`
+	ExtraFields     interface{} `json:"extra_fields,omitempty"`
+	LastActiveSince int64       `json:"last_active_since,omitempty"`
 }
 
 // PlayerCSVExportResponse wraps the standard http.Response for the

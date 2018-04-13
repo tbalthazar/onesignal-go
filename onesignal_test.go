@@ -138,10 +138,8 @@ func TestNewRequest_userKeyType(t *testing.T) {
 func TestNewRequest_invalidJSON(t *testing.T) {
 	c := NewClient(nil)
 
-	type T struct {
-		A map[int]interface{}
-	}
-	_, err := c.NewRequest("GET", "/", &T{}, APP)
+	inBody := make(chan int)
+	_, err := c.NewRequest("GET", "/", inBody, APP)
 
 	if err == nil {
 		t.Error("Expected error to be returned.")

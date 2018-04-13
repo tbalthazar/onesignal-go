@@ -7,6 +7,7 @@ import (
 	"reflect"
 	"strconv"
 	"testing"
+	"time"
 
 	"github.com/tbalthazar/onesignal-go/testhelper"
 )
@@ -377,7 +378,9 @@ func TestPlayersService_CSVExport(t *testing.T) {
 	defer teardown()
 
 	opt := &PlayerCSVExportOptions{
-		AppID: "id123",
+		AppID:           "id123",
+		ExtraFields:     []string{},
+		LastActiveSince: time.Now().Unix(),
 	}
 
 	mux.HandleFunc("/players/csv_export", func(w http.ResponseWriter, r *http.Request) {
