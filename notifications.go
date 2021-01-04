@@ -31,6 +31,7 @@ type Notification struct {
 // NotificationRequest represents a request to create a notification.
 type NotificationRequest struct {
 	AppID                  string            `json:"app_id"`
+	ApnsPushTypeOverride   string            `json:"apns_push_type_override"`
 	Contents               map[string]string `json:"contents,omitempty"`
 	Headings               map[string]string `json:"headings,omitempty"`
 	IsIOS                  bool              `json:"isIos,omitempty"`
