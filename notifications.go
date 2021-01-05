@@ -28,10 +28,14 @@ type Notification struct {
 	Contents   map[string]string `json:"contents"`
 }
 
+type IosVoipNotificationRequest struct {
+	ApnsPushTypeOverride   string            `json:"apns_push_type_override"`
+	NotificationRequest
+}
+
 // NotificationRequest represents a request to create a notification.
 type NotificationRequest struct {
 	AppID                  string            `json:"app_id"`
-	ApnsPushTypeOverride   string            `json:"apns_push_type_override"`
 	Contents               map[string]string `json:"contents,omitempty"`
 	Headings               map[string]string `json:"headings,omitempty"`
 	IsIOS                  bool              `json:"isIos,omitempty"`
@@ -199,7 +203,7 @@ func (s *NotificationsService) Get(notificationID string, opt *NotificationGetOp
 //
 // OneSignal API docs:
 // https://documentation.onesignal.com/docs/notifications-create-notification
-func (s *NotificationsService) Create(opt *NotificationRequest) (*NotificationCreateResponse, *http.Response, error) {
+func (s *NotificationsService) Create(opt *interface{}) (*NotificationCreateResponse, *http.Response, error) {
 	// build the URL
 	u, err := url.Parse("/notifications")
 	if err != nil {
