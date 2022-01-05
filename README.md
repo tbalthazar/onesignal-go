@@ -1,3 +1,5 @@
+**Remark**: this project is not maintained anymore. Feel free to fork it. <3
+
 # Go client for the OneSignal API [![Build Status](https://travis-ci.org/tbalthazar/onesignal-go.svg?branch=master)](https://travis-ci.org/tbalthazar/onesignal-go) [![GoDoc](https://godoc.org/github.com/tbalthazar/onesignal-go?status.svg)](https://godoc.org/github.com/tbalthazar/onesignal-go)
 
 This library provides a simple SDK to access the [OneSignal API](https://documentation.onesignal.com/docs/server-api-overview).
