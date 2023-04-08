@@ -71,6 +71,7 @@ type NotificationRequest struct {
 	ChromeIcon             string            `json:"chrome_icon,omitempty"`
 	ChromeBigPicture       string            `json:"chrome_big_picture,omitempty"`
 	ChromeWebIcon          string            `json:"chrome_web_icon,omitempty"`
+	ChromeWebImage         string            `json:"chrome_web_image,omitempty"`
 	FirefoxIcon            string            `json:"firefox_icon,omitempty"`
 	URL                    string            `json:"url,omitempty"`
 	SendAfter              string            `json:"send_after,omitempty"`
